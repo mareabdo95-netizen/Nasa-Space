@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>مفتش القمر والمريخ</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lalezar&family=Tajawal:wght@400;700;800&display=swap">
+<style>
+:root{--bg:#e9e8e4;--ink:#17181c;--mut:#5d5f68;--card:#fff;--line:#c9c8c2;--gold:#ffc93c;--ok:#12806a;--okbg:#d9f2ea;--bad:#b3403c;--badbg:#fbe3e1;--sky:#050506;--gnd:#8d8d89;--gnd2:#6a6a66;color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0e0f12;--ink:#efede6;--mut:#a5a8b3;--card:#17191f;--line:#2e313a;--okbg:#0f3329;--badbg:#3d1d1c;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0e0f12;--ink:#efede6;--mut:#a5a8b3;--card:#17191f;--line:#2e313a;--okbg:#0f3329;--badbg:#3d1d1c;color-scheme:dark}
+body[data-w="mars"]{--sky:#1b0c08;--gnd:#a8502f;--gnd2:#7d3a22}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Tajawal","Segoe UI",Tahoma,sans-serif;line-height:1.7}
+main{max-width:600px;margin:0 auto;padding:16px 16px 40px}
+header{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+h1{font-family:"Lalezar","Tajawal",sans-serif;font-weight:400;font-size:2.1rem;margin:0;flex:1;line-height:1.2}
+button{font:inherit;color:inherit;cursor:pointer}
+.tg{display:flex;border:2px solid var(--line);border-radius:12px;overflow:hidden}
+.tg button,.sd{border:0;background:none;padding:6px 12px;font-weight:700;min-height:44px}
+.tg button[aria-pressed=true]{background:var(--gold);color:#2b2000}
+.sd{border:2px solid var(--line);border-radius:12px}
+:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+.hero{text-align:center;padding:28px 12px}
+.num{font-family:"Lalezar",sans-serif;font-size:3.4rem;line-height:1.1;color:var(--gold);direction:ltr}
+.hero p{max-width:46ch;margin:8px auto}
+.go{display:block;width:100%;margin-top:14px;background:var(--gold);color:#2b2000;border:0;border-radius:14px;padding:12px;font-weight:800;font-size:1.1rem;min-height:48px}
+.dots{display:flex;gap:5px;margin:14px 0 10px}
+.dots i{flex:1;height:7px;border-radius:4px;background:var(--line)}
+.dots i.d{background:var(--ok)}.dots i.n{background:var(--gold)}
+.stage{position:relative;height:230px;border-radius:20px;overflow:hidden;background:var(--sky);transition:background .6s}
+.stage:before{content:"";position:absolute;left:16px;top:14px;width:22px;height:22px;border-radius:50%;background:#fff;box-shadow:0 0 18px 6px rgba(255,255,255,.45)}
+.stage:after{content:"";position:absolute;inset:auto 0 0 0;height:78px;background:linear-gradient(var(--gnd),var(--gnd2));transition:background .6s}
+.ow{position:absolute;z-index:2;left:50%;bottom:62px;width:130px;height:130px;margin-left:-65px}
+.ow svg{width:100%;height:100%;display:block}
+.sh{position:absolute;inset:0;transform:skewX(-55deg) scaleY(.35);transform-origin:bottom left;filter:brightness(0);opacity:.55}
+.ob{position:absolute;inset:0}
+.c{transition:fill 1s}.bl .c{fill:#ececec!important}
+.fp{position:absolute;z-index:3;bottom:14px;width:11px;height:18px;border-radius:50%;background:rgba(0,0,0,.35)}
+.q{background:var(--card);border:2px solid var(--line);border-radius:18px;padding:16px;margin-top:12px}
+.q h2{font-size:1.2rem;margin:0 0 12px;font-weight:800;max-width:60ch}
+.opts{display:grid;gap:10px}
+.opt{text-align:start;background:var(--bg);border:2px solid var(--line);border-radius:14px;padding:12px 14px;font-weight:700;min-height:48px}
+.opt:hover:not(:disabled){border-color:var(--gold)}.opt:disabled{cursor:default}
+.opt.ok{background:var(--okbg);border-color:var(--ok)}.opt.bad{background:var(--badbg);border-color:var(--bad)}
+.fb{margin-top:12px;padding:12px 14px;border-radius:14px;border:2px solid var(--ok);background:var(--okbg);max-width:60ch}
+.fb.no{border-color:var(--bad);background:var(--badbg)}
+.fb small{display:block;font-weight:800;margin-bottom:2px}
+.nb{margin-top:20px}.nb h3{font-family:"Lalezar",sans-serif;font-weight:400;font-size:1.4rem;margin:0 0 8px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(84px,1fr));gap:8px}
+.cd{position:relative;aspect-ratio:1;border:2px dashed var(--line);border-radius:12px;display:flex;align-items:center;justify-content:center;color:var(--mut);font-size:1.6rem}
+.cd.f{border:2px solid var(--gold);background:#0b0b0d;padding:8px}
+.cd svg{width:100%;height:100%}
+.cd i{position:absolute;bottom:2px;inset-inline:0;text-align:center;font:700 .65rem "Tajawal";color:var(--gold);font-style:normal}
+.end{text-align:center}.big{font-size:2.6rem}
+.note{font-size:.9rem;color:var(--mut)}
+[hidden]{display:none!important}
+@media (prefers-reduced-motion:no-preference){.fp{animation:pop .3s}@keyframes pop{from{transform:scale(0)}}}
+@media (prefers-reduced-motion:reduce){.c,.stage,.stage:after{transition:none}}
+</style>
+</head>
+<body data-w="moon">
+<main>
+<header><h1>مفتش القمر والمريخ</h1>
+<div class="tg" role="group" aria-label="العالم"><button id="wm" aria-pressed="true">القمر</button><button id="wr" aria-pressed="false">المريخ</button></div>
+<button class="sd" id="snd" aria-pressed="false" aria-label="كتم الصوت">🔊</button></header>
+<section id="intro" class="hero">
+<div class="num" id="num">0</div><div style="font-weight:800">كجم</div>
+<p>تقدير لكتلة معدات البشر اللي لسه على القمر. التقديرات بتختلف من مصدر لمصدر. تعالى نكتشف قصة كل حاجة!</p>
+<button class="go" id="start">ابدأ التفتيش</button></section>
+<section id="game" hidden>
+<div class="dots" id="dots" aria-hidden="true"></div>
+<div class="stage" id="stage"><div class="ow"><div class="sh" id="sh"></div><div class="ob" id="ob" role="img"></div></div></div>
+<div class="q"><h2 id="qt"></h2><div class="opts" id="opts"></div><div id="fb" hidden></div><button class="go" id="next" hidden></button></div>
+</section>
+<section id="end" class="q end" hidden><div class="big" id="st"></div><h2 id="sc"></h2><p id="ms"></p>
+<p class="note">لسه على القمر أكتر من 187,000 كجم، وعلى المريخ حوالي 7,000 كجم حطام (التقديرات بتختلف).</p>
+<button class="go" id="again">العب تاني</button></section>
+<section class="nb"><h3>كراسة الاكتشافات <span id="cnt">0/11</span></h3><div class="grid" id="grid"></div></section>
+</main>
+<script>
+var S=function(b){return '<svg viewBox="0 0 100 100" aria-hidden="true">'+b+'</svg>'};
+var I={
+flag:S('<rect x="22" y="8" width="3" height="86" fill="#cfcfcf"/><rect class="c" x="25" y="10" width="52" height="36" fill="#c0392b"/><rect class="c" x="25" y="10" width="22" height="17" fill="#2d4a9a"/><path d="M47 18H77M25 34H77M47 42H77" stroke="#fff" stroke-width="3"/>'),
+feet:S('<g fill="#b9b9b5"><ellipse cx="36" cy="40" rx="11" ry="22"/><ellipse cx="62" cy="68" rx="11" ry="22"/></g><path d="M28 34H44M28 44H44M54 62H70M54 72H70" stroke="#6a6a66" stroke-width="3"/>'),
+gear:S('<rect class="c" x="27" y="20" width="46" height="66" rx="12" fill="#e5a93a"/><rect x="36" y="52" width="28" height="22" rx="5" fill="#b9801f"/><path d="M38 20V10H62V20" fill="none" stroke="#999" stroke-width="5"/>'),
+mirror:S('<rect class="c" x="14" y="14" width="72" height="72" rx="5" fill="#9fb4c4"/><path d="M14 38H86M14 62H86M38 14V86M62 14V86" stroke="#fff" stroke-width="2.5"/><rect x="14" y="86" width="72" height="6" fill="#555"/>'),
+stage:S('<rect class="c" x="30" y="8" width="40" height="76" rx="3" fill="#dcdcd8"/><rect x="30" y="30" width="40" height="7" fill="#222"/><rect x="30" y="56" width="40" height="7" fill="#222"/><path d="M40 84L34 98H66L60 84Z" fill="#555"/>'),
+bag:S('<path class="c" d="M30 30Q50 14 70 30L77 88Q50 98 23 88Z" fill="#cfd8dc"/><rect x="43" y="14" width="14" height="12" rx="3" fill="#8a949a"/><path d="M36 50Q50 58 64 50" stroke="#8a949a" stroke-width="3" fill="none"/>'),
+rocket:S('<path class="c" d="M50 6Q72 30 64 72H36Q28 30 50 6Z" fill="#f0f0f0"/><circle cx="50" cy="38" r="8" fill="#2d6a9a"/><path d="M36 60L22 82L38 74ZM64 60L78 82L62 74Z" fill="#c0392b"/><path d="M42 76H58L50 98Z" fill="#ffc93c"/>'),
+book:S('<rect class="c" x="16" y="22" width="68" height="56" rx="6" fill="#ffc93c"/><path d="M50 22V78" stroke="#8a6500" stroke-width="3"/><path d="M24 38H44M24 48H44M56 38H76M56 48H76" stroke="#8a6500" stroke-width="3"/>'),
+shield:S('<path class="c" d="M10 74A40 40 0 0 1 90 74Z" fill="#b9873b"/><ellipse cx="50" cy="76" rx="40" ry="8" fill="#6d4a1a"/>'),
+chute:S('<path class="c" d="M8 46Q50 -14 92 46Q71 36 50 46Q29 36 8 46Z" fill="#f4f1e8"/><path d="M8 46L46 80M50 46V80M92 46L54 80" stroke="#999" stroke-width="2"/><rect x="43" y="78" width="14" height="12" fill="#555"/>'),
+beagle:S('<ellipse class="c" cx="50" cy="72" rx="36" ry="10" fill="#6a9955"/><ellipse class="c" cx="26" cy="58" rx="16" ry="7" transform="rotate(-25 26 58)" fill="#6a9955"/><ellipse class="c" cx="74" cy="58" rx="16" ry="7" transform="rotate(25 74 58)" fill="#6a9955"/><circle cx="50" cy="56" r="14" fill="#ddd"/>')
+};
+var Q=[
+{i:"flag",n:"علم",q:"الأعلام الستة اللي على القمر بقت بيضا. ليه؟",o:["لأن الشمس القوية من غير غلاف جوي يحميها بهّتت لونها","لأن المطر غسلها","لأن الرياح بيّضتها"],w:"أنا علم من ستة أعلام اتزرعوا هنا. بقيت أبيض لأن الشمس بتضربني من غير غلاف جوي يحميني، ومفيش مطر ولا رياح عندي."},
+{i:"feet",n:"أثر قدم",q:"آثار أقدام رواد أبولو لسه موجودة. ليه ما اختفتش؟",o:["مفيش هوا ولا مطر على القمر يمسحها","حد بيرسمها كل يوم","التراب بيتجمد بسرعة"],w:"أنا أثر قدم. لسه هنا لأن مفيش هوا ولا مطر يمسحني. غير شوية تراب وارتطامات نيازك صغيرة، أنا زي ما اتساب."},
+{i:"gear",n:"معدات",q:"الرواد رموا معدات قبل ما يرجعوا للأرض. ليه؟",o:["عشان المركبة تبقى أخف وترجع بأمان","عشان يزعّلوا ناسا","عشان ينوّروا القمر"],w:"أنا معدات اترمت. المركبة لازم تبقى أخف عشان ترجع بأمان، فاتساب اللي مالوش لازم وخدوا عينات صخور بدله."},
+{i:"mirror",n:"مراية ليزر",q:"في مرايا على القمر لسه بتتستخدم. العلماء بيعملوا بيها إيه؟",o:["يبعتوا ليزر ويقيسوا المسافة للقمر","يتفرجوا على نفسهم","يبعتوا رسايل لأصحابهم"],w:"أنا مراية ليزر. العلماء بيبعتولي شعاع ويستنوه يرجع، ومن الوقت بيعرفوا المسافة للقمر. أنا لسه بشتغل، مش زبالة!"},
+{i:"stage",n:"مرحلة صاروخ",q:"إيه أتقل حاجة صنعها الإنسان على القمر؟",o:["مراحل صواريخ Saturn V اللي اتصدمت بالقمر عمدًا","الأعلام","آثار الأقدام"],w:"أنا مرحلة صاروخ Saturn V (اسمي S-IVB). خلصت شغلي واتصدمت بالقمر عمدًا، وأنا من أتقل الحاجات اللي صنعها الإنسان هنا."},
+{i:"bag",n:"أكياس فضلات",q:"رواد أبولو سابوا 96 كيس فضلات. ليه بعض العلماء مهتمين بيها؟",o:["ممكن تفيدهم يدرسوا تأثير الفضاء على الحياة","هتتحول لوقود","هتتحول لأعلام"],w:"إحنا 96 كيس فضلات من رحلات أبولو. بعض العلماء شايفين إننا كنز علمي، لأننا فضلنا سنين في ظروف الفضاء."},
+{i:"rocket",n:"Space Apps",q:"إيه هو NASA Space Apps Challenge؟",o:["هاكاثون عالمي من ناسا مفتوح لناس كتير، مش مبرمجين بس","سباق صواريخ بين الدول","امتحان لرواد الفضاء"],w:"أنا NASA Space Apps. هاكاثون عالمي كل سنة، فيه مكان للمبرمجين والعلماء والمصممين وكتّاب القصص وصنّاع المحتوى."},
+{i:"book",n:"التحدي",q:"التحدي بتاعنا بيدور حوالين إيه؟",o:["حكي قصة المعدات اللي ناسا سابتها على القمر والمريخ","بناء صاروخ حقيقي","جمع الحطام من الفضاء"],w:"أنا التحدي بتاعكم! بنحكي قصة المعدات المتروكة، واللعبة دي طريقتنا نحكيها للأطفال."},
+{m:1,i:"shield",n:"حطام المريخ",q:"تقريبًا قد إيه حطام سابته المركبات على المريخ؟",o:["حوالي 7,000 كجم","حوالي 7 كجم بس","حوالي 700,000 كجم"],w:"إحنا حطام المريخ: حوالي 7,119 كجم حسب تقدير باحثين، من معدات هبوط ومركبات وقفت أو اتحطمت."},
+{m:1,i:"chute",n:"مظلة",q:"مركبة Perseverance لقت حطام من هبوطها هي نفسها. ليه كان متجمع في مكان واحد؟",o:["الرياح بتطيّر الحطام ومنطقة Hogwallow Flats بتجمعه","المريخيين رتبوه","المركبة بتحب تجمّع الأغراض"],w:"أنا حطام هبوط. الرياح طيّرتني لمنطقة Hogwallow Flats، نقطة تجميع طبيعية للحطام، والفريق بيراجع إني ما ألوّثش العينات."},
+{m:1,i:"beagle",n:"Beagle 2",q:"مركبة Beagle 2 اتلاقت على المريخ بعد وقت طويل. كام سنة؟",o:["11 سنة","يومين","100 سنة"],w:"أنا Beagle 2. اتلاقيت بعد 11 سنة، واتضح إني وصلت السطح بس ما فتحتش كامل."}
+];
+var $=function(x){return document.getElementById(x)},i=0,sc=0,lock=false,mute=false,found={},ac;
+function beep(f,d,t){if(mute)return;try{ac=ac||new(window.AudioContext||window.webkitAudioContext)();var o=ac.createOscillator(),g=ac.createGain();o.frequency.value=f;o.type=t||"sine";g.gain.value=.06;o.connect(g);g.connect(ac.destination);o.start();o.stop(ac.currentTime+d)}catch(e){}}
+function world(w){document.body.dataset.w=w;$("wm").setAttribute("aria-pressed",w==="moon");$("wr").setAttribute("aria-pressed",w==="mars")}
+$("wm").onclick=function(){world("moon")};$("wr").onclick=function(){world("mars")};
+$("snd").onclick=function(){mute=!mute;this.textContent=mute?"🔇":"🔊";this.setAttribute("aria-pressed",mute)};
+function grid(){var h="",n=0;Q.forEach(function(c,k){if(found[k]){n++;h+='<div class="cd f">'+I[c.i]+'<i>'+c.n+'</i></div>'}else h+='<div class="cd">?</div>'});$("grid").innerHTML=h;$("cnt").textContent=n+"/"+Q.length}
+function dots(){var h="";for(var k=0;k<Q.length;k++)h+='<i class="'+(k<i?"d":k===i?"n":"")+'"></i>';$("dots").innerHTML=h}
+function sh(a){a=a.slice();for(var k=a.length-1;k>0;k--){var j=Math.floor(Math.random()*(k+1)),t=a[k];a[k]=a[j];a[j]=t}return a}
+function show(){var c=Q[i];lock=false;dots();world(c.m?"mars":"moon");
+ $("ob").innerHTML=I[c.i];$("sh").innerHTML=I[c.i];$("ob").setAttribute("aria-label",c.n);
+ $("qt").textContent=(i+1)+" من "+Q.length+": "+c.q;$("fb").hidden=true;$("next").hidden=true;
+ var b=$("opts");b.innerHTML="";
+ sh(c.o.map(function(t,k){return{t:t,r:k===0}})).forEach(function(o){var e=document.createElement("button");e.className="opt";e.type="button";e.textContent=o.t;e.dataset.r=o.r?1:0;e.onclick=function(){pick(e,o.r)};b.appendChild(e)})}
+function pick(e,r){if(lock)return;lock=true;if(r)sc++;found[i]=1;grid();
+ document.querySelectorAll(".opt").forEach(function(x){x.disabled=true;if(x.dataset.r==="1")x.classList.add("ok")});
+ if(!r){e.classList.add("bad");$("ob").classList.add("bl")}
+ var p=document.createElement("span");p.className="fp";p.style.left=(8+i*8)+"%";$("stage").appendChild(p);
+ beep(r?660:220,.18,r?"sine":"triangle");if(r)setTimeout(function(){beep(880,.2)},160);
+ var f=$("fb");f.className="fb"+(r?"":" no");f.innerHTML="<small>"+(r?"برافو! 🎉":"قربت! الإجابة الصح متعلّمة بالأخضر")+" الجسم بيقول:</small>"+Q[i].w;f.hidden=false;
+ var n=$("next");n.textContent=i===Q.length-1?"شوف النتيجة":"الحاجة اللي بعدها";n.hidden=false;n.focus()}
+$("next").onclick=function(){$("ob").classList.remove("bl");document.querySelectorAll(".fp").forEach(function(x){x.remove()});i++;if(i>=Q.length)fin();else show()};
+function fin(){$("game").hidden=true;$("end").hidden=false;var s="";for(var k=0;k<5;k++)s+=k<Math.round(sc/Q.length*5)?"⭐":"☆";
+ $("st").textContent=s;$("sc").textContent="جمعت "+sc+" من "+Q.length;
+ $("ms").textContent=sc===Q.length?"أنت مفتش فضاء محترف!":sc>=Math.round(Q.length*.7)?"شغل ممتاز! قربت تبقى محترف.":"بداية حلوة. العب تاني وهتكتشف أكتر."}
+$("again").onclick=function(){i=0;sc=0;found={};grid();$("end").hidden=true;$("game").hidden=false;show()};
+$("start").onclick=function(){beep(520,.15);$("intro").hidden=true;$("game").hidden=false;show()};
+(function(){var t=187000,n=$("num");if(matchMedia("(prefers-reduced-motion:reduce)").matches){n.textContent=t.toLocaleString("en-US");return}
+ var s=null;function f(ts){s=s||ts;var p=Math.min((ts-s)/1800,1);n.textContent=Math.round(t*(1-Math.pow(1-p,3))).toLocaleString("en-US");if(p<1)requestAnimationFrame(f)}requestAnimationFrame(f)})();
+grid();
+</script>
+</body>
+</html>
