@@ -38,6 +38,7 @@ button{font:inherit;color:inherit;cursor:pointer}
 .ob{position:absolute;inset:0}
 .c{transition:fill 1s}.bl .c{fill:#ececec!important}
 .fp{position:absolute;z-index:3;bottom:14px;width:11px;height:18px;border-radius:50%;background:rgba(0,0,0,.35)}
+.nar{background:var(--card);border:2px solid var(--gold);border-radius:16px;padding:12px 14px;margin-top:12px;max-width:60ch}.nar b{display:block;font-family:"Lalezar","Tajawal",sans-serif;font-weight:400;font-size:1.25rem}
 .q{background:var(--card);border:2px solid var(--line);border-radius:18px;padding:16px;margin-top:12px}
 .q h2{font-size:1.2rem;margin:0 0 12px;font-weight:800;max-width:60ch}
 .opts{display:grid;gap:10px}
@@ -67,14 +68,16 @@ button{font:inherit;color:inherit;cursor:pointer}
 <button class="sd" id="snd" aria-pressed="false" aria-label="كتم الصوت">🔊</button></header>
 <section id="intro" class="hero">
 <div class="num" id="num">0</div><div style="font-weight:800">كجم</div>
-<p>تقدير لكتلة معدات البشر اللي لسه على القمر. التقديرات بتختلف من مصدر لمصدر. تعالى نكتشف قصة كل حاجة!</p>
+<p>تقدير لكتلة معدات البشر اللي لسه على القمر. التقديرات بتختلف من مصدر لمصدر. تعالى نشتغل في مكتب مفقودات الفضاء ونكتشف قصة كل حاجة!</p>
 <button class="go" id="start">ابدأ التفتيش</button></section>
 <section id="game" hidden>
+<div class="nar" id="nar" hidden></div>
 <div class="dots" id="dots" aria-hidden="true"></div>
 <div class="stage" id="stage"><div class="ow"><div class="sh" id="sh"></div><div class="ob" id="ob" role="img"></div></div></div>
 <div class="q"><h2 id="qt"></h2><div class="opts" id="opts"></div><div id="fb" hidden></div><button class="go" id="next" hidden></button></div>
 </section>
 <section id="end" class="q end" hidden><div class="big" id="st"></div><h2 id="sc"></h2><p id="ms"></p>
+<p id="fin"></p>
 <p class="note">لسه على القمر أكتر من 187,000 كجم، وعلى المريخ حوالي 7,000 كجم حطام (التقديرات بتختلف).</p>
 <button class="go" id="again">العب تاني</button></section>
 <section class="nb"><h3>كراسة الاكتشافات <span id="cnt">0/11</span></h3><div class="grid" id="grid"></div></section>
@@ -107,6 +110,7 @@ var Q=[
 {m:1,i:"chute",n:"مظلة",q:"مركبة Perseverance لقت حطام من هبوطها هي نفسها. ليه كان متجمع في مكان واحد؟",o:["الرياح بتطيّر الحطام ومنطقة Hogwallow Flats بتجمعه","المريخيين رتبوه","المركبة بتحب تجمّع الأغراض"],w:"أنا حطام هبوط. الرياح طيّرتني لمنطقة Hogwallow Flats، نقطة تجميع طبيعية للحطام، والفريق بيراجع إني ما ألوّثش العينات."},
 {m:1,i:"beagle",n:"Beagle 2",q:"مركبة Beagle 2 اتلاقت على المريخ بعد وقت طويل. كام سنة؟",o:["11 سنة","يومين","100 سنة"],w:"أنا Beagle 2. اتلاقيت بعد 11 سنة، واتضح إني وصلت السطح بس ما فتحتش كامل."}
 ];
+var CH={0:["الفصل 1: أول خطوة","أهلاً يا مفتش! أنا مديرة مكتب مفقودات الفضاء. أول ملفات وصلتنا من موقع الهبوط على القمر. افتحها وشوف إيه اللي اتساب هناك."],2:["الفصل 2: ليه سبناهم؟","بعض الأجسام اتساب عشان الوزن، وبعضها اتحط عن قصد عشان العلم. مش كل حاجة هنا زبالة، فاسمع كل جسم وهو بيحكي."],6:["الفصل 3: مهمتنا","قبل ما نسافر للمريخ، استراحة قصيرة: إحنا مين، وبنحكي القصص دي ليه؟"],8:["الفصل 4: المريخ","وصلتنا ملفات من كوكب تاني! المريخ كمان فيه حطام، ومنه اللي الرياح بتحركه من مكان لمكان."]};
 var $=function(x){return document.getElementById(x)},i=0,sc=0,lock=false,mute=false,found={},ac;
 function beep(f,d,t){if(mute)return;try{ac=ac||new(window.AudioContext||window.webkitAudioContext)();var o=ac.createOscillator(),g=ac.createGain();o.frequency.value=f;o.type=t||"sine";g.gain.value=.06;o.connect(g);g.connect(ac.destination);o.start();o.stop(ac.currentTime+d)}catch(e){}}
 function world(w){document.body.dataset.w=w;$("wm").setAttribute("aria-pressed",w==="moon");$("wr").setAttribute("aria-pressed",w==="mars")}
@@ -117,7 +121,8 @@ function dots(){var h="";for(var k=0;k<Q.length;k++)h+='<i class="'+(k<i?"d":k==
 function sh(a){a=a.slice();for(var k=a.length-1;k>0;k--){var j=Math.floor(Math.random()*(k+1)),t=a[k];a[k]=a[j];a[j]=t}return a}
 function show(){var c=Q[i];lock=false;dots();world(c.m?"mars":"moon");
  $("ob").innerHTML=I[c.i];$("sh").innerHTML=I[c.i];$("ob").setAttribute("aria-label",c.n);
- $("qt").textContent=(i+1)+" من "+Q.length+": "+c.q;$("fb").hidden=true;$("next").hidden=true;
+ var nr=$("nar");if(CH[i]){nr.innerHTML="<b>"+CH[i][0]+"</b>"+CH[i][1];nr.hidden=false}else nr.hidden=true;
+ $("qt").textContent="ملف رقم "+(i+1)+" من "+Q.length+": "+c.q;$("fb").hidden=true;$("next").hidden=true;
  var b=$("opts");b.innerHTML="";
  sh(c.o.map(function(t,k){return{t:t,r:k===0}})).forEach(function(o){var e=document.createElement("button");e.className="opt";e.type="button";e.textContent=o.t;e.dataset.r=o.r?1:0;e.onclick=function(){pick(e,o.r)};b.appendChild(e)})}
 function pick(e,r){if(lock)return;lock=true;if(r)sc++;found[i]=1;grid();
@@ -129,7 +134,7 @@ function pick(e,r){if(lock)return;lock=true;if(r)sc++;found[i]=1;grid();
  var n=$("next");n.textContent=i===Q.length-1?"شوف النتيجة":"الحاجة اللي بعدها";n.hidden=false;n.focus()}
 $("next").onclick=function(){$("ob").classList.remove("bl");document.querySelectorAll(".fp").forEach(function(x){x.remove()});i++;if(i>=Q.length)fin();else show()};
 function fin(){$("game").hidden=true;$("end").hidden=false;var s="";for(var k=0;k<5;k++)s+=k<Math.round(sc/Q.length*5)?"⭐":"☆";
- $("st").textContent=s;$("sc").textContent="جمعت "+sc+" من "+Q.length;
+ $("st").textContent=s;$("fin").textContent="مديرة المكتب: الأجسام اللي اكتشفتها ("+Object.keys(found).length+" من "+Q.length+") كلها بتقولك حاجة واحدة: احكوا عننا! احكي لصحابك اللي عرفته النهاردة.";$("sc").textContent="جمعت "+sc+" من "+Q.length;
  $("ms").textContent=sc===Q.length?"أنت مفتش فضاء محترف!":sc>=Math.round(Q.length*.7)?"شغل ممتاز! قربت تبقى محترف.":"بداية حلوة. العب تاني وهتكتشف أكتر."}
 $("again").onclick=function(){i=0;sc=0;found={};grid();$("end").hidden=true;$("game").hidden=false;show()};
 $("start").onclick=function(){beep(520,.15);$("intro").hidden=true;$("game").hidden=false;show()};
