@@ -1,0 +1,349 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><title>Beyond the Silent Machines</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>
+:root{color-scheme:dark;--a:#ff9b5e;--bg:rgba(10,13,20,.86);--tx:#eaeef5;--mu:#9aa5b8}
+*{box-sizing:border-box}html,body{margin:0;height:100%;overflow:hidden;background:#05070b;color:var(--tx);font:15px/1.5 system-ui,Segoe UI,Roboto,sans-serif}
+canvas{display:block}
+#hud{position:fixed;left:12px;top:max(12px,env(safe-area-inset-top));background:var(--bg);border:1px solid #ff9b5e55;padding:10px 14px;font-size:12px;letter-spacing:.06em;display:none;border-radius:6px}
+#hud b{color:var(--a)}#hud{max-width:min(680px,calc(100vw - 190px))}
+#slots{display:grid;grid-template-columns:repeat(auto-fill,minmax(118px,1fr));gap:4px;margin-top:6px}
+#slots i{display:flex;align-items:center;gap:5px;font-style:normal;font-size:10px;line-height:1.15;letter-spacing:0;padding:3px 6px;border:1px dashed #ff9b5e44;border-radius:4px;color:#6f7a8c;transition:all .4s}
+#slots i u{text-decoration:none;font-size:16px;filter:grayscale(1) brightness(.3)}
+#slots i.r{border:1px solid #ffd166;color:#fff;background:rgba(255,209,102,.16);box-shadow:0 0 12px #ffd166;animation:gl 1.4s ease-in-out infinite}
+#slots i.r u,#slots i.f u{filter:none}
+#slots i.f{border:1px solid #4cd98a;color:#fff;background:rgba(76,217,138,.15);box-shadow:0 0 8px #4cd98a}
+@keyframes gl{50%{box-shadow:0 0 22px #ffd166}}
+#ctl{position:fixed;right:12px;top:max(12px,env(safe-area-inset-top));display:flex;gap:6px}
+button{font:inherit;background:#1a2130;color:var(--tx);border:1px solid #ff9b5e66;padding:7px 14px;border-radius:5px;cursor:pointer}button:hover:not(:disabled){background:#2a3550}button:disabled{opacity:.4;cursor:default}
+#nav{position:fixed;left:12px;bottom:12px;font-size:12px;color:var(--mu);display:none}
+#pr{position:fixed;left:50%;bottom:90px;transform:translateX(-50%);background:var(--bg);border:1px solid var(--a);padding:8px 18px;border-radius:6px;display:none;letter-spacing:.08em;font-size:13px}
+#ov{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;pointer-events:none;letter-spacing:.2em;text-shadow:0 0 12px #000}
+#ov h1{font-size:clamp(24px,5vw,52px);margin:.2em;font-weight:300}#ov p{margin:.2em;color:var(--a)}
+#ov.red{background:radial-gradient(transparent 40%,rgba(255,0,0,.35));color:#ff6b5e}
+#dlg{position:fixed;inset:auto 0 0 0;margin:0 auto;max-width:820px;max-height:92vh;overflow:auto;background:var(--bg);border:1px solid #ff9b5e77;border-radius:10px 10px 0 0;padding:14px 18px;display:none;backdrop-filter:blur(6px)}
+.top{display:flex;justify-content:space-between;align-items:center;font-size:12px;letter-spacing:.12em;color:var(--a)}
+.nav i{display:inline-block;width:18px;height:6px;margin-left:4px;background:#2a3448;border-radius:3px;cursor:pointer}.nav i.ok{background:#8a5a3a}.nav i.on{background:var(--a)}
+.row{display:flex;gap:14px;margin:10px 0}.row svg{flex:none;width:84px;height:84px;background:#141a28;border-radius:8px}
+.sp{font-size:12px;letter-spacing:.15em;color:var(--a)}.say p{margin:.3em 0}
+.fig{background:#141a28;border-left:3px solid var(--a);padding:6px 10px;color:var(--mu);font-size:13px;margin:8px 0}
+.opt{display:block;width:100%;text-align:left;margin:6px 0}.opt.g{background:#1e5a3a}.opt.b{background:#6a2a2a}
+.fb{padding:8px 10px;margin:8px 0;border-radius:6px;background:#141a28}
+.bar{display:flex;justify-content:space-between;margin-top:10px}
+.badge{display:inline-block;padding:10px 18px;margin:6px;border:2px solid var(--a);border-radius:30px;font-size:20px;animation:pop .7s}
+#vid{position:fixed;inset:0;background:#000;z-index:50;display:none}#vv{width:100%;height:100%;object-fit:contain;background:#000}#vm{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;text-align:center;padding:30px;pointer-events:none;color:var(--tx)}#vb{position:absolute;right:max(16px,env(safe-area-inset-right));bottom:max(24px,env(safe-area-inset-bottom));display:flex;gap:8px}
+@keyframes pop{from{transform:scale(.2) rotate(-20deg);opacity:0}to{transform:none;opacity:1}}
+#cp{position:fixed;inset:0;display:none;pointer-events:none;border-radius:9vh;box-shadow:inset 0 0 0 11vh #0c1119,inset 0 0 0 11.6vh #2a3446,inset 0 0 160px 100px rgba(0,0,0,.55);background:radial-gradient(ellipse at 50% 120%,rgba(255,110,30,var(--h,0)),transparent 70%)}
+#cp i{position:absolute;bottom:3.6vh;width:2.2vh;height:2.2vh;border-radius:50%;background:#2b8a5a;box-shadow:0 0 10px #2b8a5a;animation:bl 1s infinite}
+#cp.al i{background:#ff3b30;box-shadow:0 0 14px #ff3b30;animation-duration:.35s}@keyframes bl{50%{opacity:.25}}
+.pb{position:fixed;top:30%;background:#fff;color:#111;padding:14px 18px;border-radius:6px;max-width:min(340px,42vw);line-height:1.45;box-shadow:0 6px 30px rgba(0,0,0,.5);opacity:0;transition:opacity .45s;display:none;pointer-events:none}.pb.on{opacity:1}
+.rg{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:6px;margin:10px 0}
+.sl{display:flex;gap:10px;align-items:center;padding:6px 10px;border:1px dashed #556;border-radius:6px;background:#141a28;transition:all .3s}.sl .ic{font-size:26px;filter:grayscale(1) brightness(.2)}.sl.RECOVERED{border:1px solid #ffd166}.sl.INSTALLED{border:1px solid #4cd98a}.sl.RECOVERED .ic,.sl.INSTALLED .ic{filter:none}.sl.hl{box-shadow:0 0 14px #ffd166}.sl small{color:var(--mu)}
+.fly{position:fixed;z-index:9;font-size:26px;transition:transform 1s ease-in,opacity 1s;pointer-events:none}
+#bp{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.55);z-index:5}.bpi{width:min(680px,94vw);max-height:84vh;overflow:auto;background:var(--bg);border:1px solid #ff9b5e77;border-radius:10px;padding:14px}
+#pa{position:fixed;left:max(14px,12.5vh);bottom:12.5vh;display:none;pointer-events:none;z-index:2}.pb{z-index:2}.pb.t::before{content:'';position:absolute;left:-18px;bottom:26px;border:9px solid transparent;border-right-color:#fff}
+</style></head><body>
+<div id="hud"><b>MISSION: REPAIR THE SPACECRAFT</b><br>NASA MACHINES DETECTED: <span id="hm">0</span>/5 &nbsp;·&nbsp; REPAIR MODULES INSTALLED: <span id="hb">0</span>/10 &nbsp;·&nbsp; SCIENCE XP: <span id="hx">0</span><div id="slots"></div></div>
+<div id="ctl"><button id="bb" title="Science Badges" aria-label="Science Badges" onclick="showBadges()">🏅</button><button id="skip">Skip intro ▸</button><button onclick="location.reload()">Restart</button></div>
+<div id="cp"><i style="left:12%"></i><i style="left:16%"></i><i style="right:12%"></i><i style="right:16%"></i></div><div id="pa"></div><div class="pb" id="pb"></div><div id="nav"></div><div id="pr"></div><div id="ov"></div><div id="dlg"></div><div id="bp"><div class="bpi"><div class="top"><span>SCIENCE BADGES COLLECTION</span><button onclick="$('bp').style.display='none'">✕</button></div><div id="bg"></div></div></div><div id="vid"><video id="vv" playsinline preload="auto"></video><div id="vm"></div><div id="vb"></div></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+const $=i=>document.getElementById(i),M=Math,rnd=(a,b)=>a+M.random()*(b-a),cl=(v,a,b)=>M.max(a,M.min(b,v)),lp=(a,b,t)=>a+(b-a)*t;
+const S={xp:0,bp:0,found:{},done:0,mode:'intro',rec:Array(10).fill(0),inst:Array(10).fill(0),bd:{}};
+const R=new THREE.WebGLRenderer({antialias:true});R.setPixelRatio(M.min(devicePixelRatio,2));R.setSize(innerWidth,innerHeight);R.shadowMap.enabled=true;document.body.prepend(R.domElement);
+const cam=new THREE.PerspectiveCamera(60,innerWidth/innerHeight,.1,4000);
+addEventListener('resize',()=>{R.setSize(innerWidth,innerHeight);cam.aspect=innerWidth/innerHeight;cam.updateProjectionMatrix()});
+const mat=(c,r=.6,m=.3)=>new THREE.MeshStandardMaterial({color:c,roughness:r,metalness:m});
+const mesh=(g,m,x=0,y=0,z=0,p)=>{const o=new THREE.Mesh(g,m);o.position.set(x,y,z);o.castShadow=true;(p||0)&&p.add(o);return o};
+
+/* ---------- SPACE SCENE ---------- */
+const sp=new THREE.Scene();sp.background=new THREE.Color(0x000004);
+{const g=new THREE.BufferGeometry(),a=[];for(let i=0;i<2000;i++){const v=new THREE.Vector3().randomDirection?0:0;const t=rnd(0,6.283),u=rnd(-1,1),s=M.sqrt(1-u*u);a.push(1800*s*M.cos(t),1800*u,1800*s*M.sin(t))}
+g.setAttribute('position',new THREE.Float32BufferAttribute(a,3));sp.add(new THREE.Points(g,new THREE.PointsMaterial({size:1.6,sizeAttenuation:false,color:0xffffff})))}
+const sun1=new THREE.DirectionalLight(0xffffff,1.7);sun1.position.set(300,150,200);sp.add(sun1,new THREE.AmbientLight(0x404058,.5));
+const planet=(()=>{const g=new THREE.SphereGeometry(200,64,40),p=g.attributes.position,c=[];
+ for(let i=0;i<p.count;i++){const x=p.getX(i),y=p.getY(i),z=p.getZ(i),n=M.sin(x*.05+y*.03)*M.cos(z*.04+x*.02)*.5+M.sin(y*.11+z*.07)*.3,k=.75+.25*n;
+  c.push(.72*k+(M.abs(y)>185?.25:0),.33*k+(M.abs(y)>185?.4:0),.19*k+(M.abs(y)>185?.4:0))}
+ g.setAttribute('color',new THREE.Float32BufferAttribute(c,3));const m=new THREE.Mesh(g,new THREE.MeshStandardMaterial({vertexColors:true,roughness:1}));sp.add(m);return m})();
+function ship(){const g=new THREE.Group(),hull=mat(0xe6e8ec,.35,.7),dk=mat(0x30343d,.5,.8),ac=mat(0xc8462e,.5,.5),pn=mat(0xbfc4cc,.4,.8),gl=mat(0x1a2a3a,.1,.9);gl.side=THREE.DoubleSide;
+ const C=(a,b,h,m,y,x=0,z=0,s=32)=>mesh(new THREE.CylinderGeometry(a,b,h,s),m,x,y,z,g);
+ C(1.5,1.7,4.2,hull,.6);C(.9,1.5,1.4,hull,3.4);mesh(new THREE.SphereGeometry(.9,32,12,0,6.283,0,1.571),hull,0,4.1,0,g);
+ mesh(new THREE.CylinderGeometry(1.15,1.31,.45,20,1,true,-.75,1.5),gl,0,3.4,0,g);
+ [-.6,.6,1.8].forEach(y=>{const r=1.73-(y+1.5)*.0476;C(r,r,.12,dk,y)});C(1.55,1.55,.25,ac,2.4);C(1.7,1.9,.9,dk,-1.95);
+ for(let i=0;i<3;i++){const a=i*2.094;C(.3,.55,1,dk,-3,M.cos(a)*.8,M.sin(a)*.8,16)}C(.35,.65,1.1,dk,-3.05,0,0,16);
+ for(let i=1;i<8;i++){const a=i*.785,p=mesh(new THREE.BoxGeometry(.7,1.5,.06),pn,M.sin(a)*1.64,.7,M.cos(a)*1.64,g);p.rotation.y=a}
+ for(let i=0;i<4;i++){const a=i*1.571+.785;mesh(new THREE.BoxGeometry(.3,.35,.3),dk,M.sin(a)*1.58,2.3,M.cos(a)*1.58,g)}
+ C(.03,.03,1.2,pn,5.5,0,0,6);mesh(new THREE.ConeGeometry(.4,.2,20),pn,0,6.05,0,g);
+ for(const s of[-1,1]){mesh(new THREE.BoxGeometry(2.4,.05,1),mat(0x1b2a55,.3,.8),s*2.9,1.2,0,g);mesh(new THREE.BoxGeometry(.5,.08,.08),pn,s*1.85,1.2,0,g)}
+ for(let i=0;i<4;i++){const a=i*1.571+.785,p1=new THREE.Vector3(M.cos(a)*1.7,-1.1,M.sin(a)*1.7),p2=new THREE.Vector3(M.cos(a)*3.3,-3.4,M.sin(a)*3.3),dv=p2.clone().sub(p1),s=mesh(new THREE.CylinderGeometry(.07,.09,dv.length(),8),dk,0,0,0,g);s.position.copy(p1).add(p2).multiplyScalar(.5);s.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0),dv.clone().normalize());mesh(new THREE.CylinderGeometry(.5,.6,.15,16),pn,p2.x,p2.y-.05,p2.z,g)}
+ mesh(new THREE.BoxGeometry(1.4,2.3,.3),mat(0x050505,.9,0),0,-.45,1.62,g);
+ const piv=new THREE.Group();piv.position.set(0,-1.6,1.78);g.add(piv);mesh(new THREE.BoxGeometry(1.3,2.2,.1),ac,0,1.1,0,piv);mesh(new THREE.BoxGeometry(.9,.6,.04),gl,0,1.5,.06,piv);g.userData.door=piv;return g}
+function shipOld(){const g=new THREE.Group(),a=mat(0xdddddd,.4,.6);
+ mesh(new THREE.CylinderGeometry(1.2,1.5,4,24),a,0,0,0,g);mesh(new THREE.ConeGeometry(1.2,2,24),mat(0xf4f4f4,.4,.5),0,3,0,g);
+ mesh(new THREE.CylinderGeometry(1.5,1.9,.4,24),mat(0x3a2a22,.9,.1),0,-2.1,0,g);
+ mesh(new THREE.CylinderGeometry(1.22,1.22,.5,24),mat(0x335577,.3,.7),0,.8,0,g);
+ for(let i=0;i<4;i++){const f=mesh(new THREE.BoxGeometry(.15,1.6,1.2),mat(0xbb4433,.5,.4),M.cos(i*1.571)*1.6,-1.4,M.sin(i*1.571)*1.6,g);f.rotation.y=-i*1.571}
+ mesh(new THREE.CylinderGeometry(.5,.8,.6,16),mat(0x222222,.5,.8),0,-2.6,0,g);return g}
+const SH=new THREE.Group(),shi=ship();shi.rotation.x=-M.PI/2;SH.add(shi);SH.scale.setScalar(1.7);sp.add(SH);
+const plasma=new THREE.Mesh(new THREE.SphereGeometry(1,20,14),new THREE.MeshBasicMaterial({color:0xff7a2a,transparent:true,opacity:0,blending:THREE.AdditiveBlending,depthWrite:false}));plasma.scale.set(2.4,2.4,5);plasma.position.z=-1;SH.add(plasma);
+const flame=new THREE.Mesh(new THREE.ConeGeometry(.6,3,12),new THREE.MeshBasicMaterial({color:0x66aaff,transparent:true,opacity:.7,blending:THREE.AdditiveBlending}));flame.rotation.x=-M.PI/2;flame.position.z=4;SH.add(flame);
+
+/* ---------- MARS SCENE ---------- */
+const mr=new THREE.Scene(),FOG=0xdcaa88;mr.fog=new THREE.Fog(FOG,50,430);mr.background=new THREE.Color(FOG);
+const H=(x,z)=>{const r=M.hypot(x,z),m=M.min(1,r/60);return m*(M.sin(x*.05)*M.cos(z*.04)*3+M.sin(x*.13+z*.09)+M.sin(x*.31)*M.cos(z*.27)*.3)+M.max(0,r-170)*.22*(1+M.sin(M.atan2(z,x)*5+1)*.6)};
+{const g=new THREE.PlaneGeometry(900,900,200,200);g.rotateX(-M.PI/2);const p=g.attributes.position,c=[];
+ for(let i=0;i<p.count;i++){const x=p.getX(i),z=p.getZ(i),h=H(x,z);p.setY(i,h);const n=M.sin(x*.7)*M.cos(z*.9)*.06+M.sin(x*.07+z*.05)*.08,k=1-cl(h/50,0,.4)*.4+n;c.push(.66*k,.32*k,.18*k)}
+ g.setAttribute('color',new THREE.Float32BufferAttribute(c,3));g.computeVertexNormals();const t=new THREE.Mesh(g,new THREE.MeshStandardMaterial({vertexColors:true,roughness:1}));t.receiveShadow=true;mr.add(t)}
+{const g=new THREE.IcosahedronGeometry(1,1),p=g.attributes.position;for(let i=0;i<p.count;i++){const k=1+.25*M.sin(p.getX(i)*5.1+p.getY(i)*7.3+p.getZ(i)*3.7);p.setXYZ(i,p.getX(i)*k,p.getY(i)*k,p.getZ(i)*k)}g.computeVertexNormals();
+ const N=450,im=new THREE.InstancedMesh(g,new THREE.MeshStandardMaterial({roughness:1,flatShading:true}),N),d=new THREE.Object3D(),col=new THREE.Color();
+ for(let i=0;i<N;i++){const x=rnd(-380,380),z=rnd(-380,380),s=.15+M.pow(M.random(),3)*(i<40?4:1.6);d.position.set(x,H(x,z)+s*.3,z);d.scale.set(s*rnd(.8,1.5),s*rnd(.5,1),s*rnd(.8,1.5));d.rotation.set(rnd(0,.5),rnd(0,6),rnd(0,.5));d.updateMatrix();im.setMatrixAt(i,d.matrix);im.setColorAt(i,col.setRGB(rnd(.3,.5),rnd(.17,.27),rnd(.11,.18)))}
+ im.castShadow=im.receiveShadow=true;mr.add(im)}
+{const sk=new THREE.Mesh(new THREE.SphereGeometry(1500,32,16),new THREE.ShaderMaterial({side:THREE.BackSide,depthWrite:false,fog:false,
+ vertexShader:'varying vec3 p;void main(){p=position;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}',
+ fragmentShader:'varying vec3 p;void main(){float h=smoothstep(-.05,.65,normalize(p).y);gl_FragColor=vec4(mix(vec3(.86,.67,.53),vec3(.62,.45,.38),h),1.);}'}));mr.add(sk);
+ const s=new THREE.Mesh(new THREE.SphereGeometry(14,16,12),new THREE.MeshBasicMaterial({color:0xfff2dd,fog:false}));s.position.set(-900,500,-800);mr.add(s)}
+const sun2=new THREE.DirectionalLight(0xffe2c0,2.1);sun2.castShadow=true;sun2.shadow.mapSize.set(2048,2048);const sc2=sun2.shadow.camera;sc2.left=sc2.bottom=-45;sc2.right=sc2.top=45;sc2.far=400;mr.add(sun2,sun2.target,new THREE.HemisphereLight(0xe8b890,0x6a3a28,.7));
+const dust=new THREE.Points(new THREE.BufferGeometry().setAttribute('position',new THREE.Float32BufferAttribute(Array.from({length:600},()=>rnd(-40,40)),3)),new THREE.PointsMaterial({color:0xe8c0a0,size:.12,transparent:true,opacity:.5}));mr.add(dust);
+const G2=new THREE.Group(),SHIP2=ship();G2.add(SHIP2);G2.scale.setScalar(2.2);mr.add(G2);
+let impacted=false;const puffs=[];
+
+/* machines */
+function wheels(g,s){for(const x of[-.55,.55])for(const z of[-.5,0,.5]){const w=mesh(new THREE.CylinderGeometry(.22*s,.22*s,.2*s,14),mat(0x222222,.9,.2),x*s,.3*s,z*s,g);w.rotation.z=M.PI/2}}
+function rover(s,c,mast){const g=new THREE.Group();mesh(new THREE.BoxGeometry(1.1*s,.4*s,1.3*s),mat(c,.5,.6),0,.65*s,0,g);mesh(new THREE.BoxGeometry(1.0*s,.06*s,1.1*s),mat(0x1b2a55,.3,.5),0,.9*s,0,g);wheels(g,s);
+ if(mast){mesh(new THREE.CylinderGeometry(.04*s,.04*s,.8*s,8),mat(0xcccccc),.3*s,1.3*s,.4*s,g);mesh(new THREE.BoxGeometry(.3*s,.15*s,.12*s),mat(0x111111),.3*s,1.75*s,.4*s,g)}return g}
+function lander(s,c,round){const g=new THREE.Group();mesh(round?new THREE.CylinderGeometry(1.1*s,1.1*s,.15*s,24):new THREE.CylinderGeometry(1.2*s,1.2*s,.3*s,6),mat(c,.5,.7),0,1.1*s,0,g);
+ for(let i=0;i<3;i++){const a=i*2.094,l=mesh(new THREE.CylinderGeometry(.04*s,.05*s,1.2*s,6),mat(0x999999),M.cos(a)*1.1*s,.55*s,M.sin(a)*1.1*s,g);l.rotation.set(M.sin(a)*.3,0,-M.cos(a)*.3);mesh(new THREE.CylinderGeometry(.2*s,.2*s,.05*s,12),mat(0x888888),M.cos(a)*1.3*s,0,M.sin(a)*1.3*s,g)}
+ if(round){for(const x of[-1,1]){mesh(new THREE.CylinderGeometry(1.3*s,1.3*s,.05*s,24),mat(0x1b2a55,.3,.5),x*1.9*s,1.2*s,0,g)}mesh(new THREE.SphereGeometry(.4*s,16,10,0,6.28,0,1.6),mat(0xdddddd),0,1.2*s,0,g)}
+ else{const d=mesh(new THREE.CylinderGeometry(.6*s,.1*s,.15*s,16),mat(0xdddddd),0,2.2*s,0,g);d.rotation.x=.5;mesh(new THREE.BoxGeometry(.9*s,.9*s,.9*s),mat(0xaaaaaa),0,1.6*s,0,g)}return g}
+const MC=[
+ {n:'Sojourner',x:30,z:-36,c:0x66ccff,b:()=>rover(1.8,0xcccccc,0),live:1},
+ {n:'Viking 1 Lander',x:-70,z:-75,c:0xffcc66,b:()=>lander(2,0xb09060,0)},
+ {n:'Spirit Rover',x:85,z:45,c:0xff8866,b:()=>rover(2.4,0xd8d8d8,1)},
+ {n:'Opportunity Rover',x:-90,z:65,c:0xff88cc,b:()=>rover(2.4,0xe0e0e0,1)},
+ {n:'InSight Lander',x:12,z:115,c:0x88ffaa,b:()=>lander(2,0xc8c8c8,1)}];
+MC.forEach(m=>{m.g=m.b();m.g.position.set(m.x,H(m.x,m.z),m.z);m.g.rotation.y=rnd(0,6);mr.add(m.g);
+ m.beam=new THREE.Mesh(new THREE.CylinderGeometry(.25,.25,60,8,1,true),new THREE.MeshBasicMaterial({color:m.c,transparent:true,opacity:.35,blending:THREE.AdditiveBlending,depthWrite:false,fog:false}));m.beam.position.set(m.x,H(m.x,m.z)+30,m.z);mr.add(m.beam)});
+
+/* astronaut */
+function astro(){const g=new THREE.Group(),w=mat(0xf4f4f4,.8,.05),gy=mat(0x9aa0aa,.6,.4),dk=mat(0x2b2f36,.7,.3),or=mat(0xe0672a,.6,.2),vs=mat(0xc9a227,.08,1);
+ mesh(new THREE.CylinderGeometry(.4,.36,.8,18),w,0,1.38,0,g).scale.z=.75;mesh(new THREE.CylinderGeometry(.37,.37,.28,18),w,0,.98,0,g).scale.z=.75;mesh(new THREE.CylinderGeometry(.385,.385,.07,18),or,0,1.14,0,g).scale.z=.75;
+ mesh(new THREE.BoxGeometry(.3,.22,.08),dk,0,1.45,.28,g);mesh(new THREE.BoxGeometry(.06,.06,.05),or,-.08,1.45,.33,g);mesh(new THREE.BoxGeometry(.06,.06,.05),mat(0x3a9ad9),.08,1.45,.33,g);
+ mesh(new THREE.CylinderGeometry(.24,.3,.14,16),gy,0,1.8,0,g);mesh(new THREE.SphereGeometry(.37,28,20),w,0,2.04,0,g);mesh(new THREE.SphereGeometry(.385,28,18,1.571-.95,1.9,.5,1.35),vs,0,2.04,0,g);
+ const rg=mesh(new THREE.TorusGeometry(.26,.045,8,20),gy,0,1.74,0,g);rg.rotation.x=1.571;for(const x of[-.34,.34])mesh(new THREE.BoxGeometry(.1,.08,.12),dk,x,2.2,.12,g);
+ mesh(new THREE.BoxGeometry(.64,.82,.3),gy,0,1.4,-.35,g);mesh(new THREE.BoxGeometry(.5,.18,.26),w,0,1.9,-.35,g);for(const x of[-.18,.18])mesh(new THREE.CylinderGeometry(.08,.08,.55,10),w,x,1.35,-.54,g);
+ const P=(x,y)=>{const p=new THREE.Group();p.position.set(x,y,0);g.add(p);return p};
+ const arm=x=>{const p=P(x,1.62);mesh(new THREE.SphereGeometry(.16,12,10),w,0,0,0,p);mesh(new THREE.CylinderGeometry(.12,.11,.4,12),w,0,-.22,0,p);mesh(new THREE.SphereGeometry(.12,10,8),gy,0,-.43,0,p);mesh(new THREE.CylinderGeometry(.105,.1,.34,12),w,0,-.6,0,p);mesh(new THREE.CylinderGeometry(.115,.115,.07,12),or,0,-.78,0,p);mesh(new THREE.SphereGeometry(.125,12,10),dk,0,-.86,0,p);return p};
+ const leg=x=>{const p=P(x,1.02);mesh(new THREE.CylinderGeometry(.17,.15,.46,12),w,0,-.23,0,p);mesh(new THREE.SphereGeometry(.15,10,8),gy,0,-.47,.05,p).scale.set(1,.8,1);mesh(new THREE.CylinderGeometry(.14,.13,.4,12),w,0,-.67,0,p);mesh(new THREE.CylinderGeometry(.15,.15,.08,12),or,0,-.84,0,p);mesh(new THREE.BoxGeometry(.26,.16,.42),dk,0,-.92,.07,p);return p};
+ return{g,aL:arm(-.52),aR:arm(.52),lL:leg(-.19),lR:leg(.19)}}
+function astroOld(){const g=new THREE.Group(),w=mat(0xf2f2f2,.7,.1),L=(x,y,r,l)=>{const p=new THREE.Group();p.position.set(x,y,0);mesh(new THREE.CylinderGeometry(r,r*.9,l,12),w,0,-l/2,0,p);g.add(p);return p};
+ mesh(new THREE.BoxGeometry(.7,.85,.42),w,0,1.3,0,g);mesh(new THREE.SphereGeometry(.31,20,16),w,0,1.97,0,g);
+ const v=mesh(new THREE.SphereGeometry(.26,20,14),mat(0x5a4320,.1,.9),0,1.98,.1,g);v.scale.z=.8;
+ mesh(new THREE.BoxGeometry(.6,.75,.3),mat(0xcfcfcf,.6,.2),0,1.3,-.35,g);mesh(new THREE.BoxGeometry(.72,.1,.44),mat(0xcc5533),0,1.0,0,g);
+ const aL=L(-.46,1.62,.1,.7),aR=L(.46,1.62,.1,.7),lL=L(-.18,.9,.14,.9),lR=L(.18,.9,.14,.9);
+ for(const [p,y] of[[aL,-.72],[aR,-.72]])mesh(new THREE.SphereGeometry(.13,10,8),mat(0x333333),0,y,0,p);
+ for(const p of[lL,lR])mesh(new THREE.BoxGeometry(.24,.16,.4),mat(0x333333),0,-.92,.07,p);
+ return{g,aL,aR,lL,lR}}
+const AS=astro();AS.g.position.set(-4,0,2);AS.g.visible=false;mr.add(AS.g);
+const pl={x:-4,z:2,vx:0,vz:0,ang:0,ph:0};let yaw=.4,pit=.35,dist=7;
+
+/* ---------- UI helpers ---------- */
+const ov=(h,c='')=>{$('ov').className=c;$('ov').innerHTML=h};
+for(let i=0;i<10;i++)$('slots').appendChild(document.createElement('i'));
+function hud(){$('hm').textContent=Object.keys(S.found).length;$('hb').textContent=S.bp;$('hx').textContent=S.xp;$('slots').innerHTML=CMP.map((c,i)=>`<i class="${S.inst[i]?'f':S.rec[i]?'r':''}" title="${c[0]}"><u>${c[1]}</u><span>${c[0]}</span></i>`).join('')}
+const keys={};addEventListener('keydown',e=>{keys[e.code]=1;if(e.code=='Enter'&&S.mode=='intro'&&IP<10){e.preventDefault();if(pmi==1)pnext();else if(pmi==2)pstart()}if(!e.repeat&&(e.code=='Enter'||e.code=='NumpadEnter'||e.code=='KeyE')){if(S.mode=='play')e.preventDefault();interact()}});addEventListener('keyup',e=>keys[e.code]=0);
+let drag=0;R.domElement.addEventListener('pointerdown',()=>drag=1);addEventListener('pointerup',()=>drag=0);addEventListener('pointermove',e=>{if(drag&&S.mode=='play'){yaw-=e.movementX*.005;pit=cl(pit+e.movementY*.004,.05,1.2)}});
+R.domElement.addEventListener('wheel',e=>dist=cl(dist+e.deltaY*.01,4,14));
+
+/* ---------- INTRO CINEMATIC ---------- */
+let T=0,shake=0,alarm=0;
+$('skip').onclick=()=>{if(S.mode=='intro'){endPres();T=Math.max(T,23)}};
+function shk(a){cam.position.x+=rnd(-a,a);cam.position.y+=rnd(-a,a)}
+let IP=0,pmi=-1;const PA=astro(),pb=$('pb'),MSG=['Welcome, explorer! Your mission is to investigate the machines left behind by NASA across the Solar System.','Discover their technology, solve scientific challenges, and recover the components needed to repair your spacecraft and return home!'];PA.g.visible=false;sp.add(PA.g);
+function endPres(){IP=10;$('pa').style.display='none';$('cp').style.display='none';pb.style.display='none';PA.g.visible=false;SH.visible=true}
+function pnext(){go1=1;IP=Math.max(IP,4.7)}function pstart(){go2=1;IP=Math.max(IP,9.3)}let go1=0,go2=0;
+const AP='<svg viewBox="0 0 84 100" width="84" height="100"><rect x="14" y="40" width="10" height="30" rx="5" fill="#bfc4cc"/><rect x="26" y="38" width="32" height="34" rx="9" fill="#f4f4f4"/><rect x="60" y="42" width="10" height="28" rx="5" fill="#e8e8e8"/><rect x="31" y="46" width="22" height="12" rx="3" fill="#2b2f36"/><circle cx="38" cy="52" r="2.5" fill="#e0672a"/><circle cx="46" cy="52" r="2.5" fill="#3a9ad9"/><rect x="28" y="70" width="11" height="22" rx="5" fill="#f4f4f4"/><rect x="45" y="70" width="11" height="22" rx="5" fill="#f4f4f4"/><rect x="25" y="88" width="16" height="9" rx="4" fill="#2b2f36"/><rect x="43" y="88" width="16" height="9" rx="4" fill="#2b2f36"/><circle cx="42" cy="24" r="21" fill="#f4f4f4"/><ellipse cx="42" cy="25" rx="14" ry="11" fill="#c9a227"/><ellipse cx="38" cy="21" rx="5" ry="3" fill="#fff" opacity=".5"/><rect x="34" y="42" width="16" height="5" fill="#9aa0aa"/></svg>';$('pa').innerHTML=AP;let stg=0;
+function pnext(){stg=1}function pstart(){stg=2}
+function pres(dt){IP+=dt;if(stg>=2)return endPres();
+ SH.visible=false;planet.position.set(0,-90,-900);planet.rotation.y+=dt*.02;cam.position.set(0,0,0);cam.lookAt(0,-50,-900);
+ $('cp').style.display='block';$('cp').className='';$('cp').style.setProperty('--h',0);
+ const on=IP>.4;$('pa').style.display=on?'block':'none';pb.style.display=on?'block':'none';
+ if(on&&pmi!=stg+1){pmi=stg+1;pb.className='pb t on';pb.style.cssText+='left:calc(12.5vh + 110px);right:auto;top:auto;bottom:15vh';pb.innerHTML=MSG[stg]+'<br><button style="margin-top:10px;background:#ff9b5e;color:#111;border:0;pointer-events:auto" onclick="'+(stg?'pstart()':'pnext()')+'">'+(stg?'Start':'Next')+' ▸</button>'}}
+function storyBox(){dl(`<div class="top"><span>MISSION BRIEFING</span><span></span></div><div class="row">${AP}<div class="say"><div class="sp">YOUR MISSION</div><p>Your spacecraft is badly damaged and cannot fly. <b>10 components</b> are broken or missing, and you need to repair them to return to Earth.</p><p>NASA left machines across Mars, and each one has a story. Find every machine and learn its story.</p><p>When you understand a machine's story, you can recover the <b>2 components</b> you need from its technology. Bring them back to your spacecraft and install them.</p></div></div><div class="bar"><span></span><button onclick="briefNext()">Next ▸</button></div>`);$('dlg').lastChild.remove()}
+function briefNext(){openRepair('Five NASA machines hold the technology for these ten modules. Complete each machine mission to recover its two modules.')}
+function presOld(dt){IP+=dt;if(!go1&&IP>4.5)IP=4.5;if(!go2&&IP>9&&IP<9.3)IP=9;const t=IP;if(t>=10)return endPres();
+ SH.visible=false;planet.position.set(0,-90,-900);planet.rotation.y+=dt*.02;cam.position.set(0,0,0);cam.lookAt(0,-50,-900);cam.updateMatrixWorld(true);
+ $('cp').style.display='block';$('cp').className='';$('cp').style.setProperty('--h',0);pb.style.display='block';
+ const sm=x=>x*x*(3-2*x),ax=t<1?lp(-6,-2.3,sm(t)):t<4.7?-2.3:t<5.5?lp(-2.3,2.3,sm((t-4.7)/.8)):2.3,mv=t<1||(t>4.7&&t<5.5),sw=mv?M.sin(t*10)*.7:0;
+ PA.g.visible=t<9.4;PA.g.scale.setScalar(.8);PA.g.position.copy(cam.localToWorld(new THREE.Vector3(ax,-1.25,-3.6)));PA.g.quaternion.copy(cam.quaternion);PA.g.rotateY(ax<0?.35:-.35);
+ PA.lL.rotation.x=sw;PA.lR.rotation.x=-sw;PA.aL.rotation.x=-sw*.6;PA.aR.rotation.x=sw*.6;
+ const mi=t>1&&t<4.7?1:t>5.5&&t<9.3?2:0;if(mi!==pmi){pmi=mi;if(mi){pb.innerHTML=MSG[mi-1]+'<br><button style="margin-top:10px;background:#ff9b5e;color:#111;border:0;pointer-events:auto" onclick="'+(mi==1?'pnext()':'pstart()')+'">'+(mi==1?'Next ▸':'Start ▸')+'</button>';pb.style.left=mi==1?'28%':'auto';pb.style.right=mi==1?'auto':'28%'}pb.classList.toggle('on',!!mi)}}
+function intro(dt){if(IP<10){pres(dt);if(IP<10)return sp}T+=dt;let sc=sp;
+ if(T<16){const z=-M.min(T,11)*30;SH.position.set(0,M.sin(T)*.3-M.max(0,T-11)*4,z);SH.rotation.z=M.sin(T*.7)*.05;planet.position.set(0,-40,-1150+M.min(T,11)*40);planet.rotation.y+=dt*.01;
+  cam.position.set(lp(14,-11,cl(T/11,0,1)),lp(5,3,cl(T/11,0,1)),z+lp(28,22,cl(T/11,0,1)));cam.lookAt(SH.position.x,SH.position.y,z-8);
+  if(T>=6){SH.visible=false;cam.position.set(SH.position.x,SH.position.y+.6,z-3);cam.lookAt(planet.position);if(T>=11)cam.rotateZ(M.sin(T*2.6)*(T-11)*.1);$('cp').style.display='block';$('cp').className=T>=11?'al':'';$('cp').style.setProperty('--h',cl((T-6)/5,0,1)*.55)}else SH.visible=true;
+  if(T>1&&T<5)ov('<h1>BEYOND THE SILENT MACHINES</h1>'+(T>3?'<p>Mission Destination: Mars</p>':''));else if(T<6)ov('');
+  const e=cl((T-6)/5,0,1);plasma.material.opacity=e*.6*(.8+.2*M.sin(T*40));flame.material.opacity=T<11?.7:0;sp.background.setRGB(e*.12,e*.04,e*.02);
+  if(T>6&&T<11)ov('<p>ATMOSPHERIC ENTRY</p>');
+  if(T>=11){shake=.1+.25*M.abs(M.sin(T*4.3))*(T-11)/5;alarm=M.floor(T*3)%2;ov('<h1>WARNING – SYSTEM FAILURE</h1><p>ATMOSPHERIC ENTRY ERROR</p><p>THERMAL PROTECTION SYSTEM: CRITICAL</p><p>NAVIGATION SYSTEM: UNSTABLE</p><p>EMERGENCY LANDING REQUIRED — '+M.ceil(16-T)+'</p>',alarm?'red':'');SH.rotation.z+=dt*(T-11)*.4;
+   if(M.random()<.3){const s=new THREE.Mesh(new THREE.SphereGeometry(.08),new THREE.MeshBasicMaterial({color:0xffcc66}));s.position.set(rnd(-1,1),rnd(-1,1),rnd(-1,1));SH.add(s);setTimeout(()=>SH.remove(s),150)}}
+  else shake=.01+(T>6?(T-6)*.02:0);
+ }else{sc=mr;$('cp').style.display='none';const k=cl((T-16)/3.5,0,1),cx=-14,cz=-10,gy=H(cx,cz);G2.position.set(cx,lp(gy+90,gy+4.2,k*k),cz);G2.rotation.set(lp(3,.14,k),(1-k)*5,lp(.3,.26,k));
+  cam.position.set(cx+30,gy+lp(95,14,k),cz+46);cam.lookAt(G2.position);shake=k<1?.1:0;
+  if(k>=1&&!impacted){impacted=true;shake=.9;for(let i=0;i<24;i++){const p=new THREE.Mesh(new THREE.BoxGeometry(.5,.4,.4),new THREE.MeshStandardMaterial({color:0x5a3a28}));p.position.set(cx+rnd(-4,4),gy+3,cz+rnd(-4,4));p.userData.v=new THREE.Vector3(rnd(-8,8),rnd(5,14),rnd(-8,8));p.userData.d=1;mr.add(p);puffs.push(p)}for(let i=0;i<14;i++){const p=new THREE.Mesh(new THREE.SphereGeometry(1,8,6),new THREE.MeshBasicMaterial({color:0xcc9a78,transparent:true,opacity:.6,fog:true}));p.position.set(cx+rnd(-3,3),gy+1,cz+rnd(-3,3));p.userData.v=new THREE.Vector3(rnd(-3,3),rnd(.5,2.5),rnd(-3,3));mr.add(p);puffs.push(p)}}
+  if(T<19)ov('');else if(T<23)ov('<h1>CRITICAL SYSTEM DAMAGE</h1><p>10 COMPONENTS REQUIRED FOR REPAIR</p>');
+  if(T>=23){S.mode='exit';$('skip').style.display='none'}}
+ if(impacted)shake=M.max(0,.8-(T-19.5)*.5);if(shake)shk(shake);return sc}
+puffs.upd=dt=>puffs.forEach(p=>{if(p.userData.d){p.userData.v.y-=9*dt;p.position.addScaledVector(p.userData.v,dt);p.rotation.x+=dt*5;return}p.position.addScaledVector(p.userData.v,dt);p.scale.addScalar(dt*2.5);p.material.opacity=M.max(0,p.material.opacity-dt*.12)});
+
+/* ---------- EXPLORATION ---------- */
+let near=null;
+function play(dt){const f=(keys.KeyW||keys.ArrowUp?1:0)-(keys.KeyS||keys.ArrowDown?1:0),r=(keys.KeyD||keys.ArrowRight?1:0)-(keys.KeyA||keys.ArrowLeft?1:0);
+ let tx=0,tz=0;if(S.mode=='exit'){tx=EX.vx;tz=EX.vz}if(S.mode=='play'&&(f||r)){const l=M.hypot(f,r),sp_=(keys.ShiftLeft||keys.ShiftRight?9:4.5);tx=(-M.sin(yaw)*f+M.cos(yaw)*r)/l*sp_;tz=(-M.cos(yaw)*f-M.sin(yaw)*r)/l*sp_}
+ const k=1-M.exp(-dt*(tx||tz?7:9));pl.vx+=(tx-pl.vx)*k;pl.vz+=(tz-pl.vz)*k;pl.x+=pl.vx*dt;pl.z+=pl.vz*dt;
+ const spd=M.hypot(pl.vx,pl.vz);if(spd>.3){let t=M.atan2(pl.vx,pl.vz),d=t-pl.ang;d=M.atan2(M.sin(d),M.cos(d));pl.ang+=d*cl(dt*10,0,1)}
+ pl.ph+=spd*dt*(spd>6?1.1:1.6);const sw=M.sin(pl.ph)*cl(spd/4,0,1)*(spd>6?.95:.6),y=H(pl.x,pl.z);
+ AS.g.position.set(pl.x,y+M.abs(M.cos(pl.ph))*.06*cl(spd/4,0,1),pl.z);AS.g.rotation.y=pl.ang;AS.lL.rotation.x=sw;AS.lR.rotation.x=-sw;AS.aL.rotation.x=-sw*.8;AS.aR.rotation.x=sw*.8;
+ const ct=new THREE.Vector3(pl.x,y+1.6,pl.z),o=new THREE.Vector3(M.sin(yaw)*M.cos(pit),M.sin(pit),M.cos(yaw)*M.cos(pit)).multiplyScalar(dist);
+ const cp=ct.clone().add(o);cp.y=M.max(cp.y,H(cp.x,cp.z)+1);cam.position.lerp(cp,1-M.exp(-dt*8));cam.lookAt(ct);
+ sun2.position.set(pl.x-70,y+60,pl.z-40);sun2.target.position.set(pl.x,y,pl.z);
+ near=null;let nd=1e9,un=null,ud=1e9;MC.forEach(m=>{const d=M.hypot(m.x-pl.x,m.z-pl.z);m.beam.material.opacity=.25+.12*M.sin(T*3+m.x);if(d<nd){nd=d;near=m}if(!m.dn&&d<ud){ud=d;un=m}
+  if(d<12&&!S.found[m.n]){S.found[m.n]=1;hud();ov('<p>SIGNAL ACQUIRED</p><h1>'+m.n.toUpperCase()+'</h1>');setTimeout(()=>ov(''),2200)}});
+ const pr=$('pr');if(S.mode=='play'&&near&&nd<7){pr.style.display='block';pr.textContent=near.dn?'MISSION COMPLETE – '+near.n.toUpperCase():'Press ENTER to interact'}else if(S.mode=='play'&&M.hypot(pl.x+14,pl.z+10)<10){pr.style.display='block';pr.textContent=S.rec.some((r,i)=>r&&!S.inst[i])?'Two new components recovered! Press Enter to install them.':'Press ENTER to open the repair interface'}else pr.style.display='none';
+ $('nav').textContent=S.rec.some((r,i)=>r&&!S.inst[i])?'Return to the spacecraft: '+M.round(M.hypot(pl.x+14,pl.z+10))+' m':un?'Nearest signal: '+un.n+' · '+M.round(ud)+' m':'';
+ const dp=dust.geometry.attributes.position;for(let i=0;i<dp.count;i++){dp.setX(i,dp.getX(i)+dt*(1.5+i%3));if(dp.getX(i)>40)dp.setX(i,-40)}dp.needsUpdate=true;dust.position.set(pl.x,y+8,pl.z)}
+const CMP=[['Navigation Gyroscope Sensor','🧭',0],['Mobility Control Unit','⚙️',0],['Robotic Manipulator Unit','🦾',1],['Atmospheric Sensor Array','🌡️',1],['Panoramic Navigation Camera','📷',2],['Surface Abrasion Actuator','🔧',2],['Mineral Spectrometry Module','💎',3],['Microscopic Imaging Sensor','🔬',3],['Seismic Vibration Sensor','📈',4],['Precision Deployment Actuator','🛠️',4]],MN=['Sojourner Rover','Viking 1 Lander','Spirit Rover','Opportunity Rover','InSight Lander'],sleep=ms=>new Promise(r=>setTimeout(r,ms));let busy=0;
+function openRepair(msg){const pend=S.rec.map((r,i)=>r&&!S.inst[i]?i:-1).filter(i=>i>=0),n=S.inst.filter(Boolean).length;
+ dl(`<div class="top"><span>SPACECRAFT STATUS: ${n==10?'REPAIRED':'CRITICAL'}</span><span>REPAIR PROGRESS: ${n}/10</span></div><div class="rg">`+CMP.map((c,i)=>{const st=S.inst[i]?'INSTALLED':S.rec[i]?'RECOVERED':'MISSING';return `<div class="sl ${st}" id="s${i}"><span class="ic">${c[1]}</span><div><b>${c[0]}</b><br><small>${MN[c[2]]} · ${st}</small></div></div>`}).join('')+'</div>'+(msg?`<div class="fb">${msg}</div>`:'')+(pend.length?`<div class="bar"><span></span><button id="ib" onclick="install()">Install ${pend.length} recovered component${pend.length>1?'s':''}</button></div>`:''))}
+async function install(){if(busy)return;busy=1;$('ib').disabled=true;const pend=S.rec.map((r,i)=>r&&!S.inst[i]?i:-1).filter(i=>i>=0),p=G2.position.clone();p.y+=8;p.project(cam);const tx=cl((p.x*.5+.5)*innerWidth,40,innerWidth-40),ty=cl((-p.y*.5+.5)*innerHeight,40,innerHeight*.45);
+ for(const i of pend){const el=$('s'+i),r=el.getBoundingClientRect(),f=document.createElement('span');el.classList.add('hl');f.className='fly';f.textContent=CMP[i][1];f.style.left=r.left+'px';f.style.top=r.top+'px';document.body.appendChild(f);await sleep(60);f.style.transform=`translate(${tx-r.left}px,${ty-r.top}px) scale(2.2)`;f.style.opacity=.3;await sleep(1050);f.remove();S.inst[i]=1;S.bp=S.inst.filter(Boolean).length;hud();el.className='sl INSTALLED';el.querySelector('small').textContent=MN[CMP[i][2]]+' · INSTALLED';const b=new THREE.Mesh(new THREE.SphereGeometry(.12,8,6),new THREE.MeshBasicMaterial({color:0x44ff99}));b.position.set(M.cos(i*.9+1)*1.66,-.3+i*.3,M.sin(i*.9+1)*1.66);SHIP2.add(b);await sleep(300)}
+ busy=0;if(S.mode=='talk')openRepair(pend.length+' COMPONENTS INSTALLED — SPACECRAFT REPAIR PROGRESS: '+S.bp+'/10')}
+function showBadges(){$('bg').innerHTML='<div class="rg">'+MN.map((m,i)=>{const b=S.bd[i];return b&&b.length?b.map(x=>`<div class="sl INSTALLED"><span class="ic">🏅</span><div><b>${x.n}</b><br><small>${m} · ${x.s} · EARNED</small></div></div>`).join(''):`<div class="sl"><span class="ic">🏅</span><div><b>Locked badge</b><br><small>${m} · LOCKED · subject revealed on completion</small></div></div>`}).join('')+'</div>';$('bp').style.display='flex'}
+let lockT=0;const EX={t:0,vx:0,vz:0,lift:0,i:0,base:.7},hv=new THREE.Vector3(),hd=new THREE.Vector3();
+function exitSeq(dt){const door=SHIP2.userData.door;
+ if(!EX.i){EX.i=1;G2.updateMatrixWorld(true);door.getWorldPosition(hv);hd.set(0,0,1).transformDirection(G2.matrixWorld);hd.y=0;hd.normalize();EX.base=M.max(0,hv.y-H(hv.x,hv.z));pl.x=hv.x-hd.x*2.5;pl.z=hv.z-hd.z*2.5;pl.vx=pl.vz=0;pl.ang=M.atan2(hd.x,hd.z);AS.g.visible=false;EX.lift=EX.base;ov('<p>EMERGENCY HATCH OPENING…</p>')}
+ EX.t+=dt;const k=cl((EX.t-.6)/1.6,0,1);door.rotation.x=1.82*k*k*(3-2*k);if(k<1){EX.vx=EX.vz=0;return}
+ ov('');const d=(pl.x-hv.x)*hd.x+(pl.z-hv.z)*hd.z;EX.vx=hd.x*2.2;EX.vz=hd.z*2.2;AS.g.visible=d>-.25;EX.lift=d<0?EX.base:M.max(0,EX.base-.256*d);
+ if(d>6.5){S.mode='talk';EX.vx=EX.vz=0;lockT=T+.6;setTimeout(storyBox,0);$('hud').style.display='block';$('nav').style.display='block';hud();ov('<p>EXPLORE MARS</p>');setTimeout(()=>ov(''),1800)}}
+function interact(){if(S.mode!='play'||T<lockT||$('bp').style.display=='flex')return;if(M.hypot(pl.x+14,pl.z+10)<10){S.mode='talk';lockT=T+.8;$('pr').style.display='none';if(document.activeElement)document.activeElement.blur();return openRepair()}if(!near||M.hypot(near.x-pl.x,near.z-pl.z)>=7||near.dn)return;S.mode='talk';lockT=T+.8;$('pr').style.display='none';if(document.activeElement)document.activeElement.blur();
+ curM=near;startLearn();if(1){}
+ else dl(`<div class="top"><span>${near.n.toUpperCase()}</span><span>LINK ESTABLISHED</span></div><div class="row"><div class="say"><div class="sp">${near.n.toUpperCase()}</div><p>This machine's story chapters and Final Mission are not part of this build yet.</p></div></div>`)}
+function interactOld(){if(0){S.mode='talk';$('pr').style.display='none';ov('<p>ESTABLISHING LINK…</p>');setTimeout(()=>{ov('');ch=0;showCh()},900)}}
+
+/* ---------- SOJOURNER SUB-GAME ---------- */
+let CH=[
+['The Mission Story',['Hello, Explorer! I am Sojourner, a small NASA rover.','I landed on Mars on July 4, 1997, with the Mars Pathfinder mission, in a region called Ares Vallis.'],'FIG: Pathfinder lander (home base) + Sojourner rover, 1997'],
+['Why Was I Built?',['Before me, NASA robots only studied Mars from one spot or from orbit.','NASA wanted to test if a small, low-cost rover could drive on Mars and study rocks up close.'],'FIG: A lander stays put. A rover can go and look.'],
+['The Big Challenge',['Mars is full of rocks and sand. Driving here is not easy!','Also, a signal from Earth takes several minutes to reach me, so nobody can steer me live.'],'FIG: Rocky terrain, Ares Vallis',{q:'What do you think helps me move across this difficult surface?',o:['My six wheels','A pair of wings','A water engine'],a:0,r:['Yes! Six wheels on a flexible frame called a rocker-bogie keep me steady over rocks.','Not quite. Mars air is very thin, and I carry no water engine. My six wheels do the work!']}],
+['Meet My Parts',['I have six wheels on a rocker-bogie suspension: a frame that tilts so all wheels stay on the ground.','I carry cameras, a solar panel for power, and an instrument called APXS (Alpha Proton X-ray Spectrometer).'],'FIG: 🛞×6 · ☀ solar panel · 📷 cameras · APXS'],
+['The Science Behind Me',['Rocks are made of chemical elements, like silicon, iron and magnesium.','Knowing which elements are in a rock tells scientists how it formed, like clues for a detective.'],'FIG: Rock = mix of elements → clues about history'],
+['How Do I Work?',['To use APXS, I place it right against a rock or soil. It measures the energy of particles and X-rays coming back, which shows which elements are present.','Because of the signal delay, I can spot hazards on my own and stop before I drive into trouble.'],'FIG: APXS touches rock → reads elements'],
+['Experiment Time',['Explorer, I found an interesting rock! But looking at it does not tell scientists everything.'],'FIG: A rock named "Yogi" was studied by APXS',{q:'How can I help scientists learn what the rock is made of?',o:['Use APXS','Drive over it faster','Take a picture of my own wheels'],a:0,r:['Right! APXS reads the chemical elements in the rock.','Nice try, but only an instrument like APXS can measure the elements inside rock.']}],
+['My Scientific Discoveries',['APXS measured the chemistry of several rocks and soil near the landing site.','Images from the mission showed rounded pebbles, which hint that flowing water may once have shaped this area. I did not find life.'],'FIG: Rounded pebbles → clue to ancient water'],
+['My Last Signal',['I was planned to work for about 7 sols (Mars days), but kept going for about 83 sols.','The last data transmission from Pathfinder came on September 27, 1997.'],'FIG: Planned 7 sols → worked ~83 sols'],
+['What Did We Learn?',['Small rovers can explore Mars. Wheels and clever suspension handle rocks. APXS reveals chemistry. And rocks tell the story of a planet.','Ready for the Final Mission? Your science skills are needed!'],'FIG: Rover + instrument + rock = discovery']];
+let Q=[
+['Choose the Right Tool','Robotics','Which feature helped me climb over rocks?',['Rocker-bogie six-wheel suspension','A propeller','Ski runners'],0,'The rocker-bogie frame lets wheels adjust so all six stay on the ground.',3],
+['Choose the Right Tool','Chemistry','A rock needs its chemical elements measured. Which instrument?',['APXS','Wheel motor','Solar panel'],0,'APXS (Alpha Proton X-ray Spectrometer) reads which elements a rock contains.',4],
+['True or False','Planetary Science','Sojourner landed on Mars in 1997 as part of Mars Pathfinder.',['True','False'],0,'Pathfinder landed July 4, 1997 and carried Sojourner.',1],
+['Fix the Problem','Engineering','Signals from Earth take minutes to arrive. What helped me avoid hazards?',['Steering me live with a joystick','Onboard hazard detection so I could stop myself','Driving only downhill'],1,'Live steering is impossible with delay, so the rover could detect hazards on its own.',6],
+['Match the Parts','Physics','Which part turns sunlight into power?',['Camera','Solar panel','APXS'],1,'Solar cells convert sunlight into electricity to run the rover.',4],
+['Analyze the Evidence','Geology','Images show rounded pebbles. What does this suggest?',['Water may once have flowed there','A volcano erupted yesterday','Wind made them square'],0,'Water tumbling rocks smooths and rounds them, a clue to ancient flows.',8],
+['What Happens Next?','Planetary Science','The rover was planned for about 7 sols. What happened?',['It stopped on day 7','It worked far longer, about 83 sols','It never turned on'],1,'It exceeded its plan many times over, about 83 sols.',9],
+['True or False','Robotics','Sojourner was steered in real time from Earth.',['True','False'],1,'Signal delay means commands were sent ahead and the rover handled hazards itself.',3],
+['Match the Parts','Chemistry','APXS tells scientists mainly about a rock’s…',['Chemical elements','Age in years only','Color of its shadow'],0,'APXS identifies which elements are present.',5],
+['Choose the Right Tool','Geology','Why do scientists study rocks on Mars?',['Rocks record the planet’s history','Rocks are fuel','Rocks block signals'],0,'Rock chemistry and shape reveal how Mars formed and changed.',4],
+['Fix the Problem','Engineering','Why was a small, low-cost rover a good first test?',['It could be tried cheaply to prove rovers work','It was the fastest rover ever','It carried every instrument'],0,'NASA wanted to prove a small rover could drive and do science before building bigger ones.',2],
+['True or False','Planetary Science','Sojourner found confirmed evidence of life on Mars.',['True','False'],1,'It studied rocks and soil; no confirmed life was found.',8]];
+const BADGE={Robotics:'Roboticist',Engineering:'Engineer',Chemistry:'Chemist',Geology:'Geologist',Physics:'Physicist','Planetary Science':'Planetary Scientist'};
+const PORT='<svg viewBox="0 0 84 84"><rect x="18" y="30" width="48" height="20" rx="4" fill="#cfd4dc"/><rect x="22" y="22" width="40" height="7" fill="#26407a"/><circle cx="24" cy="58" r="7" fill="#444"/><circle cx="42" cy="58" r="7" fill="#444"/><circle cx="60" cy="58" r="7" fill="#444"/><rect x="58" y="12" width="2" height="18" fill="#bbb"/><circle cx="59" cy="12" r="3" fill="#ff9b5e"/></svg>';
+
+const VOICE=['SOJOURNER · NASA ROVER','VIKING 1 · NASA LANDER','SPIRIT · NASA ROVER','OPPORTUNITY · NASA ROVER','INSIGHT · NASA LANDER'];let curI=0;
+const ALL=[{CH:CH,Q:Q},
+{CH:[
+['The Mission Story',['Hello, Explorer! I am Viking 1, a NASA lander.','I touched down on Mars on July 20, 1976, on a plain called Chryse Planitia. I was NASA’s first successful Mars lander.'],'FIG: Viking orbiter above, lander below, 1976'],
+['Why Was I Built?',['People had wondered for a very long time: is there life on Mars?','NASA sent me to look for signs of life in the soil, and to study Martian weather and chemistry.'],'FIG: The big question: life on Mars?'],
+['Meet My Parts',['I have cameras, a weather station, and a small robotic arm with a scoop.','Inside my body are tiny laboratories. My power comes from two RTGs, devices that turn the heat of radioactive material into electricity.'],'FIG: 📷 cameras · 🦾 scoop arm · 🔬 mini labs · RTG power',{q:'Which part of me can pick up Martian soil?',o:['My robotic arm','My camera','My weather station'],a:0,r:['Yes! My arm scoops soil and drops it into my labs.','Not quite. Cameras and weather sensors cannot dig. My arm does the scooping!']}],
+['How Do I Work?',['My arm scoops soil and delivers it to the experiments inside me.','One instrument, called a GCMS, heats the soil and sorts the gases that come out, to find out which molecules are inside.'],'FIG: Arm scoops → lab heats soil → molecules identified',{q:'Which instrument identifies the molecules in heated soil?',o:['GCMS','A wheel motor','A solar panel'],a:0,r:['Right! The GCMS is my molecule detective.','Not this one. I have no wheels, and I am not solar powered. The GCMS does the detective work!']}],
+['My Scientific Discoveries',['My biology experiments gave some puzzling results, so scientists checked with the GCMS.','It found no organic molecules in the soil I tested, so most scientists concluded my experiments did not show life.'],'FIG: Soil sample → no organic molecules found'],
+['My Last Signal',['I was planned to work for about 90 days, but I kept going for about 6 years, sending pictures, weather reports and data. Contact was lost in November 1982.','Now I stand silent on Chryse Planitia. Ready for the Final Mission?'],'FIG: Planned 90 days → worked about 6 years']],
+Q:[
+['Choose the Right Tool','Robotics','Which part picks up soil for the experiments?',['A robotic arm with a scoop','A camera','An antenna'],0,'The arm scoops soil and delivers it to the lander’s labs.',3],
+['Choose the Right Tool','Chemistry','Which instrument heats soil to identify its molecules?',['GCMS','Solar panel','Weather mast'],0,'The GCMS sorts the gases released from heated soil.',4],
+['True or False','Planetary Science','Viking 1 landed on Mars in 1976.',['True','False'],0,'It landed on July 20, 1976.',1],
+['What Happens Next?','Planetary Science','Viking 1 was planned for about 90 days. What happened?',['It worked for about 6 years','It stopped after one day','It never landed'],0,'It far outlasted its plan. Contact was lost in November 1982.',6],
+['Analyze the Evidence','Chemistry','The GCMS found no organic molecules. What did most scientists conclude?',['The experiments did not show life','Mars is full of cities','The soil was only ice'],0,'Without organic molecules, most scientists decided the results did not show life.',5]]},
+{CH:[
+['The Mission Story',['Hello, Explorer! I am Spirit, a NASA rover.','I landed on Mars on January 4, 2004, inside Gusev Crater. My twin, Opportunity, landed on the other side of the planet three weeks later.'],'FIG: Spirit in Gusev Crater, 2004'],
+['Why Was I Built?',['Scientists wondered if Mars once had water, and if Gusev Crater once held a lake.','NASA sent me, a robot geologist, to read the rocks and soil for clues.'],'FIG: Crater + rocks = clues to old water'],
+['Meet My Parts',['I have six wheels, a mast with panoramic cameras, solar panels, and a robotic arm.','On that arm is a RAT, a Rock Abrasion Tool that grinds away a rock’s dusty surface.'],'FIG: 🛞×6 · 📷 Pancam · ☀ solar panels · RAT on arm',{q:'What does my RAT do?',o:['Grinds a rock’s surface so I can see inside','Takes my picture','Makes my electricity'],a:0,r:['Yes! Grinding shows fresh rock under the dust.','Not quite. RAT stands for Rock Abrasion Tool. It grinds rock!']}],
+['How Do I Work?',['Dust covers Martian rocks and hides what they are made of.','So I grind a small patch, then press my instruments against it to read its minerals and elements.'],'FIG: Grind dust → instruments read fresh rock',{q:'Why do I grind the dust off a rock first?',o:['To see fresh rock underneath','To make it shinier','To make it lighter'],a:0,r:['Right! Fresh rock tells the true story.','Not this time. Dust hides the real rock, so grinding reveals it.']}],
+['My Scientific Discoveries',['In the Columbia Hills, my instruments found silica-rich soil and minerals that form with water, possibly from hot springs or steam.','So parts of ancient Mars may have been wet and warm.'],'FIG: Silica-rich soil → clue to hot water'],
+['My Last Signal',['I was planned to work for 90 sols, but I kept going for about 6 years.','In 2009 I got stuck in soft sand. My last signal reached Earth in March 2010. Ready for the Final Mission?'],'FIG: Planned 90 sols → worked about 6 years']],
+Q:[
+['Choose the Right Tool','Engineering','Which tool grinds away a rock’s dusty surface?',['RAT','Antenna','Wheel'],0,'The Rock Abrasion Tool exposes fresh rock.',3],
+['Fix the Problem','Geology','Dust hides what a rock is made of. What helps?',['Grinding the dust away','Painting the rock','Ignoring it'],0,'Grinding shows fresh rock.',4],
+['True or False','Planetary Science','Spirit’s twin rover, Opportunity, also landed on Mars in 2004.',['True','False'],0,'Opportunity landed on January 25, 2004.',1],
+['Analyze the Evidence','Geology','Silica-rich soil forms with water. What does it suggest?',['Water once existed in this area','Mars never had water','Trees once grew there'],0,'Such soil can form with hot water or steam.',5],
+['What Happens Next?','Engineering','What happened to Spirit in 2009?',['It got stuck in soft sand','It flew away','It was repaired on Earth'],0,'Spirit got stuck in soft sand. Its last signal came in March 2010.',6]]},
+{CH:[
+['The Mission Story',['Hello, Explorer! I am Opportunity, Spirit’s twin.','I landed on Mars on January 25, 2004, on a flat plain called Meridiani Planum.'],'FIG: Opportunity on Meridiani Planum, 2004'],
+['Why Was I Built?',['Orbiters had spotted a mineral there called gray hematite, which on Earth often forms with water.','NASA sent me to check the ground up close.'],'FIG: Orbiter clue → rover checks on the ground'],
+['Meet My Parts',['Like Spirit, I have six wheels, cameras, solar panels and a robotic arm.','On my arm is a Microscopic Imager, a camera that takes close-up pictures of rocks.'],'FIG: 🛞×6 · ☀ solar · 🔬 Microscopic Imager',{q:'Which instrument takes close-up pictures of rock?',o:['Microscopic Imager','Wheel','Solar panel'],a:0,r:['Yes! It shows tiny details in rocks.','Not quite. The Microscopic Imager does the close-ups.']}],
+['How Do I Work?',['A rover cannot send rocks to Earth, so I read them where they lie.','My instruments identify minerals and elements, and my cameras show how rocks are layered.'],'FIG: Cameras + instruments = rock story'],
+['My Scientific Discoveries',['I found layered rocks and tiny round grains nicknamed blueberries, rich in hematite.','Salty water once soaked these rocks, so Meridiani Planum was wet long ago.'],'FIG: Blueberries (hematite) → clue to water',{q:'What do the hematite blueberries hint at?',o:['Water once soaked the rocks','A volcano erupted yesterday','Snow falls every day'],a:0,r:['Right! They formed in water.','Not this time. They point to ancient water.']}],
+['My Last Signal',['I was planned to work for 90 sols, but I kept going for about 14 years and drove about 45 km, farther than a marathon.','A huge dust storm in 2018 blocked the sunlight, and my last signal came in June 2018. Ready for the Final Mission?'],'FIG: Planned 90 sols → worked about 14 years']],
+Q:[
+['Choose the Right Tool','Geology','Which instrument takes close-up pictures of rock?',['Microscopic Imager','Wheel','Antenna'],0,'It shows tiny details in rocks.',3],
+['Analyze the Evidence','Geology','Hematite blueberries hint at what?',['Water once soaked these rocks','A recent eruption','Constant snow'],0,'They formed in water.',5],
+['True or False','Planetary Science','Opportunity landed on Mars in 2004.',['True','False'],0,'It landed on January 25, 2004.',1],
+['Fix the Problem','Physics','A 2018 dust storm blocked sunlight. Why did that matter?',['I ran on solar power','I ran on wind power','I ran on batteries only'],0,'Without sunlight, solar panels could not charge the rover.',6],
+['What Happens Next?','Planetary Science','Opportunity was planned for 90 sols. What happened?',['It worked about 14 years','It stopped in one week','It never started'],0,'It lasted far longer than planned.',6]]},
+{CH:[
+['The Mission Story',['Hello, Explorer! I am InSight, a NASA lander.','I landed on Mars on November 26, 2018, on a smooth plain called Elysium Planitia. I never move. I stay put and listen.'],'FIG: InSight on Elysium Planitia, 2018'],
+['Why Was I Built?',['Planets have layers inside: a crust, a mantle and a core.','NASA sent me to study the inside of Mars, like a doctor listening to a heartbeat.'],'FIG: Crust · mantle · core'],
+['Meet My Parts',['I have a robotic arm, solar panels, a heat probe nicknamed the mole, and a seismometer called SEIS.','My arm placed SEIS gently on the ground.'],'FIG: 🦾 arm · ☀ solar · 📈 SEIS',{q:'Which instrument listens for marsquakes?',o:['SEIS','The arm','The solar panel'],a:0,r:['Yes! SEIS is my seismometer.','Not quite. SEIS is the seismometer that feels quakes.']}],
+['How Do I Work?',['When a marsquake happens, waves travel through Mars. SEIS measures them.','Scientists study how the waves bend and speed up to learn what is inside. A dome protected SEIS from wind.'],'FIG: Quake → waves → SEIS → clues',{q:'How do scientists learn about the inside of Mars from quakes?',o:['By studying how quake waves travel','By digging a tunnel','By weighing Mars'],a:0,r:['Right! Waves change as they pass through layers.','Not this time. Quake waves carry the clues.']}],
+['My Scientific Discoveries',['I detected over 1,300 marsquakes, and the shaking from meteorites hitting Mars.','The data showed Mars has a crust, a mantle and a liquid core. My mole could not dig deep enough, but we learned from that too.'],'FIG: Over 1,300 marsquakes recorded'],
+['My Last Signal',['Dust slowly covered my solar panels, and I ran low on power.','In December 2022 NASA declared my mission ended. Ready for the Final Mission?'],'FIG: Dusty solar panels → low power']],
+Q:[
+['Choose the Right Tool','Physics','Which instrument measures marsquakes?',['SEIS','Camera','Antenna'],0,'SEIS is a seismometer.',3],
+['Analyze the Evidence','Planetary Science','How do quake waves help scientists?',['They show what Mars is made of inside','They move rocks','They make wind'],0,'Waves change as they pass through layers.',4],
+['True or False','Engineering','InSight drove across Mars.',['True','False'],1,'InSight is a stationary lander.',1],
+['What Happens Next?','Engineering','Why did InSight’s mission end?',['Dust covered its solar panels','It ran out of fuel','It was lost in a flood'],0,'Less sunlight meant less power.',6],
+['Analyze the Evidence','Planetary Science','What did InSight’s data show about Mars’s core?',['It is liquid','It is made of ice cream','It is empty'],0,'The data showed a liquid core.',5]]}];
+let ch=0,maxCh=0,ans={},qi=0,got=[];
+const VID={'Sojourner':'sojourner_intro.mp4','Viking 1 Lander':'viking_intro.mp4','Spirit Rover':'spirit_intro.mp4','Opportunity Rover':'opportunity_intro.mp4','InSight Lander':'insight_intro.mp4'};
+let curM=null;const vv=$('vv'),vbtn=h=>$('vb').innerHTML=h,SKIP='<button onclick="endIntro()">Skip Intro ▸</button>',START='<button onclick="startLearn()">Start Learning ▸</button>',REPLAY='<button onclick="showIntro(curM)">↻ Replay Intro</button>';
+function showIntro(m){curM=m;S.mode='video';pl.vx=pl.vz=0;for(const k in keys)keys[k]=0;$('pr').style.display='none';$('dlg').style.display='none';ov('');$('vid').style.display='block';$('vm').textContent='';vbtn(SKIP);
+ vv.onended=()=>endIntro();vv.onerror=()=>introFail();vv.src=VID[m.n];vv.currentTime=0;const p=vv.play();if(p&&p.catch)p.catch(e=>{if(e&&e.name=='NotAllowedError')vbtn('<button onclick="resumeIntro()">▶ Play Intro</button>'+SKIP);else introFail()})}
+function resumeIntro(){vbtn(SKIP);vv.play().catch(introFail)}
+function introFail(){vv.pause();$('vm').textContent='The intro video ('+VID[curM.n]+') could not be loaded. You can continue to the learning section.';vbtn(START+REPLAY)}
+function endIntro(){vv.pause();vbtn(START+REPLAY)}
+function startLearn(){vv.pause();vv.onended=vv.onerror=null;$('vid').style.display='none';S.mode='talk';lockT=T+.8;const m=curM;
+ ch=0;maxCh=0;ans={};qi=0;got=[];curI=MC.indexOf(m);CH=ALL[curI].CH;Q=ALL[curI].Q;showCh()}
+const dl=h=>{$('dlg').innerHTML=h+'<div style="text-align:right;margin-top:8px">'+''+'<button onclick="exitSub()">✕ Exit to Mars</button></div>';$('dlg').style.display='block'};function exitSub(){$('dlg').style.display='none';ov('');S.mode='play';lockT=T+.6}
+const say=t=>`<div class="row">${PORT}<div class="say"><div class="sp">${VOICE[curI]} (STORYTELLING VOICE)</div>${t}</div></div>`;
+function go(i){if(i<=maxCh){ch=i;showCh()}}
+function pick(i){ans[ch]=i;S.xp+=0;showCh()}
+function nxt(d){if(ch+d>CH.length-1){qi=0;got=[];return showQ()}ch+=d;maxCh=M.max(maxCh,ch);showCh()}
+function showCh(){const c=CH[ch],q=c[3],a=ans[ch];
+ dl(`<div class="top"><span>CHAPTER ${ch+1} / ${CH.length} · ${c[0].toUpperCase()}</span><span class="nav">${CH.map((_,i)=>`<i class="${i==ch?'on':i<=maxCh?'ok':''}" onclick="go(${i})"></i>`).join('')}</span></div>`+say(c[1].map(t=>`<p>${t}</p>`).join(''))+`<div class="fig">${c[2]}</div>`+
+ (q?`<p><b>${q.q}</b></p>`+q.o.map((o,i)=>`<button class="opt ${a==null?'':i==q.a?'g':i==a?'b':''}" ${a==null?'':'disabled'} onclick="pick(${i})">${o}</button>`).join('')+(a!=null?`<div class="fb">${q.r[a==q.a?0:1]}</div>`:''):'')+
+ `<div class="bar"><button ${ch?'':'disabled'} onclick="nxt(-1)">◂ Previous</button><button ${q&&a==null?'disabled':''} onclick="nxt(1)">${ch==CH.length-1?'Begin Final Mission ▸':'Next ▸'}</button></div>`)}
+function showQ(){if(qi>=Q.length)return results();const q=Q[qi];
+ dl(`<div class="top"><span>THE FINAL MISSION · ${qi+1} / ${Q.length}</span><span>${q[0].toUpperCase()}</span></div>`+say(qi?'<p>Next mission problem, Explorer.</p>':'<p>You have learned my story, Explorer. Now I need your help. Are you ready? Can you complete the mission?</p>')+`<p><b>${q[2]}</b></p>`+q[3].map((o,i)=>`<button class="opt" onclick="ansQ(${i})">${o}</button>`).join(''))}
+function ansQ(i){const q=Q[qi],ok=i==q[4];got.push(ok);if(ok)S.xp+=10;hud();
+ dl(`<div class="top"><span>THE FINAL MISSION · ${qi+1} / ${Q.length}</span><span>${ok?'+10 XP':'NO XP'}</span></div>`+say(`<p><b>${q[2]}</b></p>`)+q[3].map((o,j)=>`<button class="opt ${j==q[4]?'g':j==i?'b':''}" disabled>${o}</button>`).join('')+
+ `<div class="fb">${ok?'✔ Mission scientist move! ':'✘ Not this time. '}${q[5]}${ok?'':' Review Chapter '+q[7]+'.'}</div><div class="bar"><span></span><button onclick="qi++;showQ()">${qi==Q.length-1?'See results ▸':'Continue ▸'}</button></div>`)}
+function results(){const st={};Q.forEach((q,i)=>{const s=st[q[1]]=st[q[1]]||[0,0];s[1]++;if(got[i])s[0]++});
+ const el=Object.entries(st).filter(e=>e[1][1]>=2).map(e=>[e[0],e[1][0]/e[1][1],e[1][1]]).sort((a,b)=>b[1]-a[1]||b[2]-a[2]),top=el[0],bs=el.filter((e,i)=>i<2&&e[1]>0&&e[1]>=top[1]-.1);
+ const n=got.filter(Boolean).length;S.xp+=30;curM.dn=1;S.rec[curI*2]=S.rec[curI*2+1]=1;S.badges=bs.map(b=>BADGE[b[0]]);S.bd[curI]=bs.map(b=>({n:BADGE[b[0]],s:b[0]}));hud();
+ dl(`<div class="top"><span>MISSION COMPLETE</span><span>${n} / ${Q.length} CORRECT · +30 COMPLETION XP</span></div>`+say(`<p>${bs.length?`Your strongest scientific subject is <b>${bs.map(b=>b[0]).join(' and ')}</b>!`:'Every explorer starts somewhere. Replay the chapters to earn a badge!'}</p>`)+
+ `<div style="text-align:center">${bs.map(b=>`<div class="badge">🏅 ${BADGE[b[0]]}</div>`).join('')}</div><div class="fig"><b>MISSION COMPLETED!</b> You have successfully explored ${MN[curI]} and discovered how its technology worked.<br><b>You recovered 2 spacecraft repair modules:</b><br>${[0,1].map(k=>`<span class="badge" style="font-size:16px">${CMP[curI*2+k][1]} ${CMP[curI*2+k][0]}</span>`).join('')}<br>These are fictional repair modules inspired by ${MN[curI]}’s real technology; the real machine is untouched. TOTAL XP: ${S.xp}</div><div class="bar"><span></span><button onclick="back()">Return to Mars ▸</button></div>`)}
+function back(){$('dlg').style.display='none';S.mode='play';lockT=T+.6;ov('<p>2 MODULES RECOVERED</p><h1>RETURN TO THE SPACECRAFT</h1>');setTimeout(()=>ov(''),3200)}
+
+/* ---------- LOOP ---------- */
+const clock=new THREE.Clock();let cur=sp;
+(function loop(){requestAnimationFrame(loop);const dt=M.min(clock.getDelta(),.05);
+ if(S.mode=='intro')cur=intro(dt);else{cur=mr;T+=dt;if(S.mode=='exit')exitSeq(dt);if(S.mode!='video')play(dt);if(S.mode=='exit')AS.g.position.y+=EX.lift}
+ puffs.upd(dt);R.render(cur,cam)})();
+</script></body></html>
